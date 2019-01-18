@@ -1,0 +1,20 @@
+{
+    "name": "laminalfalah/smart-quiz-app",
+    "description": "Skripsi",
+    "require": {
+        "phpmailer/phpmailer": "dev-master"
+    },
+    "license": "Open Source",
+    "authors": [
+        {
+            "name": "Laminal Falah",
+            "email": "laminalfalah08@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+      "psr-4": {
+        "Config\\": "config/"
+      }
+    }
+}
