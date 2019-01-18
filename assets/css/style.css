@@ -1,0 +1,935 @@
+#login div.form-group {
+  margin-bottom: 22px;
+}
+#login input.btn {
+  border-radius: 5px;
+}
+.login-box-body, .register-box-body {
+    border-radius: 10px;
+}
+#loading {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 100%;
+  height: 100%;
+  //background-color: rgba(61, 64, 59, 0.5);
+  background-color: rgba(39, 41, 37, 0.64);
+}
+#loading i {
+  display: inline-block;
+  color: #fff;
+  position: fixed;
+  text-align: center;
+  width: 100%;
+  top: 45%;
+}
+li.user-menu > a.dropdown-toggle {
+  padding: 15px 22px;
+}
+.navbar-nav > .user-menu > .dropdown-menu {
+  width: 160px;
+}
+.navbar-nav > .user-menu > .dropdown-menu > .user-body {
+  padding: 0px;
+}
+#tabelsiswa thead tr {
+  background-color: rgb(255, 255, 50);
+}
+#tabelsiswa thead tr th:nth-child(1) {
+  width: 3% !important;
+}
+#tabelsiswa tbody tr td:nth-child(1) {
+  font-weight: bold;
+}
+#tabelsiswa thead tr th:nth-child(2) {
+  text-align: center;
+  width: 13% !important;
+}
+#tabelsiswa tbody tr td:nth-child(2) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelsiswa thead tr th:nth-child(5) {
+  text-align: center;
+  width: 12% !important;
+}
+#tabelsiswa tbody tr td:nth-child(5) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelsiswa thead tr th:nth-child(6) {
+  width: 10% !important;
+  text-align: center;
+}
+#tabelsiswa tbody tr td:nth-child(6) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelsiswa thead tr th:nth-child(7) {
+  width: 17% !important;
+  max-width: 17% !important;
+  text-align: center;
+}
+#tabelsiswa tbody tr td:nth-child(7) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelsiswa tbody.tabelsiswa-error tr td {
+  text-align: center;
+}
+
+#tabelguru thead tr {
+  background-color: rgb(255, 255, 50);
+}
+#tabelguru thead tr th:nth-child(1) {
+  width: 3% !important;
+}
+#tabelguru tbody tr td:nth-child(1) {
+  font-weight: bold;
+}
+#tabelguru thead tr th:nth-child(2) {
+  text-align: center;
+  width: 13% !important;
+}
+#tabelguru tbody tr td:nth-child(2) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelguru thead tr th:nth-child(5) {
+  text-align: center;
+  width: 12% !important;
+}
+#tabelguru tbody tr td:nth-child(5) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelguru thead tr th:nth-child(6) {
+  width: 10% !important;
+  text-align: center;
+}
+#tabelguru tbody tr td:nth-child(6) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelguru thead tr th:nth-child(7) {
+  width: 17% !important;
+  max-width: 17% !important;
+  text-align: center;
+}
+#tabelguru tbody tr td:nth-child(7) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelguru tbody.tabelguru-error tr td {
+  text-align: center;
+}
+
+#tabelstaff thead tr {
+  background-color: rgb(255, 255, 50);
+}
+#tabelstaff thead tr th:nth-child(1) {
+  width: 3% !important;
+}
+#tabelstaff tbody tr td:nth-child(1) {
+  font-weight: bold;
+}
+#tabelstaff thead tr th:nth-child(2) {
+  text-align: center;
+  width: 13% !important;
+}
+#tabelstaff tbody tr td:nth-child(2) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelstaff thead tr th:nth-child(5) {
+  width: 10% !important;
+  text-align: center;
+}
+#tabelstaff tbody tr td:nth-child(5) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelstaff thead tr th:nth-child(6) {
+  width: 17% !important;
+  max-width: 17% !important;
+  text-align: center;
+}
+#tabelstaff tbody tr td:nth-child(6) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelstaff tbody.tabelstaff-error tr td {
+  text-align: center;
+}
+
+#tabelpelatih thead tr {
+  background-color: rgb(255, 255, 50);
+}
+#tabelpelatih thead tr th:nth-child(1) {
+  width: 3% !important;
+}
+#tabelpelatih tbody tr td:nth-child(1) {
+  font-weight: bold;
+}
+#tabelpelatih thead tr th:nth-child(4) {
+  width: 10% !important;
+  text-align: center;
+}
+#tabelpelatih tbody tr td:nth-child(4) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelpelatih thead tr th:nth-child(5) {
+  width: 17% !important;
+  max-width: 17% !important;
+  text-align: center;
+}
+#tabelpelatih tbody tr td:nth-child(5) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelpelatih tbody.tabelpelatih-error tr td {
+  text-align: center;
+}
+
+#tabelakun thead tr {
+  background-color: rgb(255, 255, 50);
+}
+#tabelakun thead tr th:nth-child(1) {
+  width: 3% !important;
+}
+#tabelakun tbody tr td:nth-child(1) {
+  font-weight: bold;
+}
+#tabelakun thead tr th:nth-child(4) {
+  width: 10% !important;
+  text-align: center;
+}
+#tabelakun tbody tr td:nth-child(4) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelakun thead tr th:nth-child(5) {
+  width: 15% !important;
+  text-align: center;
+}
+#tabelakun tbody tr td:nth-child(5) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelakun thead tr th:nth-child(6) {
+  width: 26% !important;
+  max-width: 26% !important;
+  text-align: center;
+}
+#tabelakun tbody tr td:nth-child(6) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelakun tbody.tabelakun-error tr td {
+  text-align: center;
+}
+
+#tabelwalikelas thead tr {
+  background-color: rgb(255, 255, 50);
+}
+#tabelwalikelas thead tr th:nth-child(1) {
+  width: 3% !important;
+}
+#tabelwalikelas tbody tr td:nth-child(1) {
+  font-weight: bold;
+}
+#tabelwalikelas thead tr th:nth-child(2) {
+  text-align: center;
+  width: 13% !important;
+}
+#tabelwalikelas tbody tr td:nth-child(2) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelwalikelas thead tr th:nth-child(4) {
+  text-align: center;
+  width: 12% !important;
+}
+#tabelwalikelas tbody tr td:nth-child(4) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelwalikelas thead tr th:nth-child(5) {
+  width: 10% !important;
+  text-align: center;
+}
+#tabelwalikelas tbody tr td:nth-child(5) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelwalikelas thead tr th:nth-child(6) {
+  width: 17% !important;
+  max-width: 17% !important;
+  text-align: center;
+}
+#tabelwalikelas tbody tr td:nth-child(6) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelwalikelas tbody.tabelwalikelas-error tr td {
+  text-align: center;
+}
+
+#tabelpelatihsiswa thead tr {
+  background-color: rgb(255, 255, 50);
+}
+#tabelpelatihsiswa thead tr th:nth-child(1) {
+  width: 3% !important;
+}
+#tabelpelatihsiswa tbody tr td:nth-child(1) {
+  font-weight: bold;
+}
+
+#tabelpelatihsiswa thead tr th:nth-child(4) {
+  width: 17% !important;
+  max-width: 17% !important;
+  text-align: center;
+}
+#tabelpelatihsiswa tbody tr td:nth-child(4) {
+  margin: 0 auto;
+  left: 50%;
+  text-align: center;
+}
+#tabelpelatihsiswa tbody.tabelpelatihsiswa-error tr td {
+  text-align: center;
+}
+
+#tabelpilihsiswa {
+  width: 100% !important;
+}
+
+.boxModal {
+  margin-top: 15px;
+  border-bottom: 1px solid #f4f4f4;
+}
+.modal-content {
+  border-radius: 5px;
+}
+#modalDetailTabel tbody tr td:nth-child(1) {
+  width: 20% !important;
+}
+#modalDetailTabel tbody tr td:nth-child(2) {
+  width: 80% !important;
+}
+#modalDetailTabel tbody tr:nth-child(8) {
+  text-align: center;
+  font-weight: bold;
+}
+
+#modalDetailTabel1 tbody tr td:nth-child(1) {
+  width: 20% !important;
+}
+#modalDetailTabel1 tbody tr td:nth-child(2) {
+  width: 80% !important;
+}
+
+#modalDetailTabel2 tbody tr td:nth-child(1) {
+  width: 20% !important;
+}
+#modalDetailTabel2 tbody tr td:nth-child(2) {
+  width: 80% !important;
+}
+#modalDetailTabel2 tbody tr:nth-child(8) {
+  text-align: center;
+  font-weight: bold;
+}
+
+#siswa thead tr th:nth-child(1){
+  width: 3% !important;
+}
+#siswa thead tr th:nth-child(2){
+  width: 20% !important;
+}
+#siswa thead tr th:nth-child(3){
+  width: 3% !important;
+}
+#siswa thead tr > th.tanggal{
+  width: 10% !important;
+}
+#bodySiswa tr td:nth-child(3) {
+  text-align: center;
+}
+
+#tabelsiswabayar tbody tr td:nth-child(1){
+  width: 10%;
+}
+#tabelsiswabayar tbody tr td:nth-child(2){
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* ----------- iPhone 4 and 4S ----------- */
+
+/* Portrait and Landscape */
+@media only screen and (min-device-width: 320px) and (max-device-width: 480px) and (-webkit-min-device-pixel-ratio: 2) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 22px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Portrait */
+@media only screen and (min-device-width: 320px) and (max-device-width: 480px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 22px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Landscape */
+@media only screen and (min-device-width: 320px) and (max-device-width: 480px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: landscape) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 100%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 28px;
+    text-align: center;
+    margin: 15px auto;
+    font-weight: 300;
+  }
+}
+
+/* ----------- iPhone 5, 5S, 5C and 5SE ----------- */
+
+/* Portrait and Landscape */
+@media only screen and (min-device-width: 320px) and (max-device-width: 568px) and (-webkit-min-device-pixel-ratio: 2) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Portrait */
+@media only screen and (min-device-width: 320px) and (max-device-width: 568px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+  div#message {
+    font-size: 12px;
+  }
+  li.user-menu {
+    margin-right: 8px;
+  }
+  li.user-menu > a.dropdown-toggle {
+    padding: 15px 14px;
+  }
+  .navbar-nav > .user-menu > .dropdown-menu {
+    width: 160px;
+  }
+  .navbar-custom-menu > .navbar-nav > li > .dropdown-menu {
+    right: 2%;
+  }
+}
+
+/* Landscape */
+@media only screen and (min-device-width: 320px) and (max-device-width: 568px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: landscape) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 100%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 30px;
+    text-align: center;
+    margin: 15px auto;
+    font-weight: 300;
+  }
+}
+
+/* ----------- iPhone 6, 6S, 7 and 8 ----------- */
+
+/* Portrait and Landscape */
+@media only screen and (min-device-width: 375px) and (max-device-width: 667px) and (-webkit-min-device-pixel-ratio: 2) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 28px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Portrait */
+@media only screen and (min-device-width: 375px) and (max-device-width: 667px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 28px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Landscape */
+@media only screen and (min-device-width: 375px) and (max-device-width: 667px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: landscape) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 100%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 33px;
+    text-align: center;
+    margin: 15px auto;
+    font-weight: 300;
+  }
+}
+
+/* ----------- iPhone 6+, 7+ and 8+ ----------- */
+
+/* Portrait and Landscape */
+@media only screen and (min-device-width: 414px) and (max-device-width: 736px) and (-webkit-min-device-pixel-ratio: 3) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 31px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Portrait */
+@media only screen and (min-device-width: 414px) and (max-device-width: 736px) and (-webkit-min-device-pixel-ratio: 3) and (orientation: portrait) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 31px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Landscape */
+@media only screen and (min-device-width: 414px) and (max-device-width: 736px) and (-webkit-min-device-pixel-ratio: 3) and (orientation: landscape) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 100%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 35px;
+    text-align: center;
+    margin: 15px auto;
+    font-weight: 300;
+  }
+}
+
+/* ----------- iPhone X / XS ----------- */
+
+/* Portrait and Landscape */
+@media only screen and (min-device-width: 375px) and (max-device-width: 812px) and (-webkit-min-device-pixel-ratio: 3) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 33px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Portrait */
+@media only screen and (min-device-width: 375px) and (max-device-width: 812px) and (-webkit-min-device-pixel-ratio: 3) and (orientation: portrait) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 33px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Landscape */
+@media only screen and (min-device-width: 375px) and (max-device-width: 812px) and (-webkit-min-device-pixel-ratio: 3) and (orientation: landscape) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 100%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 33px;
+    text-align: center;
+    margin: 15px auto;
+    font-weight: 300;
+  }
+}
+
+/* ----------- iPhone Xr / XS Max ----------- */
+
+/* Portrait and Landscape */
+@media only screen and (min-device-width: 414px) and (max-device-width: 896px) and (-webkit-min-device-pixel-ratio: 2) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Portrait */
+@media only screen and (min-device-width: 414px) and (max-device-width: 896px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Landscape */
+@media only screen and (min-device-width: 414px) and (max-device-width: 896px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: landscape) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 100%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 36px;
+    text-align: center;
+    margin: 15px auto;
+    font-weight: 300;
+  }
+}
+
+/* ----------- iPad 1, 2, Mini and Air ----------- */
+
+/* Portrait and Landscape */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 1) {
+  .login-box, .register-box {
+    width: 60%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Portrait */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 1) {
+  .login-box, .register-box {
+    width: 60%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Landscape */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 1) {
+  .login-box, .register-box {
+    width: 60%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 36px;
+    text-align: center;
+    margin: 15px auto;
+    font-weight: 300;
+  }
+}
+
+/* ----------- iPad 3, 4 and Pro 9.7" ----------- */
+
+/* Portrait and Landscape */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) {
+  .login-box, .register-box {
+    width: 60%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Portrait */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 2) {
+  .login-box, .register-box {
+    width: 60%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Landscape */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 2) {
+  .login-box, .register-box {
+    width: 60%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 36px;
+    text-align: center;
+    margin: 15px auto;
+    font-weight: 300;
+  }
+}
+
+/* ----------- iPad Pro 10.5" ----------- */
+
+/* Portrait and Landscape */
+@media only screen and (min-device-width: 834px) and (max-device-width: 1112px) and (-webkit-min-device-pixel-ratio: 2) {
+  .login-box, .register-box {
+    width: 60%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Portrait */
+@media only screen and (min-device-width: 834px) and (max-device-width: 1112px) and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 2) {
+  .login-box, .register-box {
+    width: 60%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Landscape */
+@media only screen and (min-device-width: 1112px) and (max-device-width: 834px) and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 2) {
+  .login-box, .register-box {
+    width: 90%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 36px;
+    text-align: center;
+    margin: 15px auto;
+    font-weight: 300;
+  }
+}
+
+/* ----------- iPad Pro 12.9" ----------- */
+
+/* Portrait and Landscape */
+@media only screen and (min-device-width: 1024px) and (max-device-width: 1336px) and (-webkit-min-device-pixel-ratio: 1) {
+  .login-box, .register-box {
+    width: 60%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Portrait */
+@media only screen and (min-device-width: 1024px) and (max-device-width: 1336px) and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 1) {
+  .login-box, .register-box {
+    width: 60%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+  }
+}
+
+/* Landscape */
+@media only screen and (min-device-width: 1336px) and (max-device-width: 1024px) and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 1) {
+  .login-box, .register-box {
+    width: 60%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 36px;
+    text-align: center;
+    margin: 15px auto;
+    font-weight: 300;
+  }
+}
+
+/* ----------- Non-Retina Screens ----------- */
+@media screen and (min-device-width: 1200px) and (max-device-width: 1600px) and (-webkit-min-device-pixel-ratio: 1) {
+  .login-box, .register-box {
+    width: 40%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 36px;
+    text-align: center;
+    margin: 15px auto;
+    font-weight: 300;
+  }
+}
+
+/* ----------- Retina Screens ----------- */
+@media screen and (min-device-width: 1200px) and (max-device-width: 1600px) and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi) {
+  .login-box, .register-box {
+    width: 30%;
+    margin-top: 0px;
+    height: 90%;
+  }
+  .login-logo,
+  .register-logo {
+    font-size: 36px;
+    text-align: center;
+    margin: 15px auto;
+    font-weight: 300;
+  }
+}
