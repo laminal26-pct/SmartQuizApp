@@ -11,9 +11,9 @@ class ComposerStaticInitbfba4d533506007ef9b325f204a1db24
         array (
             'PHPMailer\\PHPMailer\\' => 20,
         ),
-        'C' => 
+        'A' => 
         array (
-            'Config\\' => 7,
+            'App\\' => 4,
         ),
     );
 
@@ -22,7 +22,7 @@ class ComposerStaticInitbfba4d533506007ef9b325f204a1db24
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
-        'Config\\' => 
+        'App\\' => 
         array (
             0 => __DIR__ . '/../..' . '/config',
         ),
