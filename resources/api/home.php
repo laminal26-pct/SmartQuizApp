@@ -1,7 +1,12 @@
 <?php
+  use PHPMailer\PHPMailer\PHPMailer;
+  use PHPMailer\PHPMailer\Exception;
   require_once '../../path.php';
   require_once (ABSPATH . 'config/config.php');
   require_once (ABSPATH . 'config/database.php');
+  require_once (ABSPATH . 'vendor/autoload.php');
+  $app = APPDEBUG;
+  $appName = APPNAME;
   $url = BASE_URL;
   header("Access-Control-Allow-Origin: $url");
   header("Content-Type: application/json; charset=UTF-8");
@@ -9,19 +14,604 @@
   header("Access-Control-Max-Age: 3600");
   header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-  $data = [];
-  $_token = $_GET['_token'];
-  $token = mysqli_query($link,"SELECT UNIX_TIMESTAMP(expried_in) as exp, access_token FROM tb_token WHERE access_token='$_token' LIMIT 1");
-  $r = mysqli_fetch_assoc($token);
-  $old = $r['exp'];
-  if ($old > time()) {
-    if (mysqli_num_rows($token) == 1) {
-      # code...
+  $data = array();
+  $sqlKuis = "SELECT tb_kuis.*, tb_rating.*, tb_users.id_user, tb_users.username, tb_kategori.id_kategori, tb_kategori.nama_kategori, tb_mapel.* FROM tb_kuis
+              LEFT JOIN (SELECT *, AVG(tb_rating.rating) as rate FROM tb_rating GROUP BY id_kuis) tb_rating ON tb_rating.id_kuis = tb_kuis.id_kuis
+              INNER JOIN tb_users ON tb_users.id_user = tb_kuis.id_user
+              INNER JOIN tb_kategori ON tb_kategori.id_kategori = tb_kuis.id_kategori
+              INNER JOIN tb_mapel ON tb_mapel.id_mapel = tb_kuis.id_mapel
+              WHERE tb_kuis.status='1'";
+  $sqlProfile = "SELECT tb_level.*, tb_users.id_user, tb_users.id_level, tb_users.username, tb_users.email,
+                 tb_profile.id_profil, tb_profile.id_user, tb_profile.nama, tb_profile.tgl_lahir, tb_profile.jk, tb_profile.no_hp,
+                 tb_profile.almt, tb_profile.saldo, tb_profile.poin, tb_profile.nama_bank, tb_profile.no_rek, tb_profile.atas_nama
+                 FROM tb_users
+                 INNER JOIN tb_level ON tb_level.id_level = tb_users.id_level
+                 INNER JOIN tb_profile ON tb_profile.id_user = tb_users.id_user";
+
+  if (isset($_GET['_token']) != NULL) {
+    $_token = $_GET['_token'];
+    $token = mysqli_query($link,"SELECT UNIX_TIMESTAMP(expried_in) as exp, access_token, id_user FROM tb_token WHERE access_token='$_token' LIMIT 1");
+    $r = mysqli_fetch_assoc($token);
+    $old = $r['exp'];
+    $id = $r['id_user'];
+    if ($old > time()) {
+      if (mysqli_num_rows($token) == 1) {
+        if (isset($_GET['f']) && isset($_GET['d'])) {
+          $route = $_GET['f'];
+          $uuid  = $_GET['d'];
+          if ($route == NULL && $uuid == NULL) {
+            $data['home'] = array(
+              'kode' => '0',
+              'message' => 'URL Can\'t Empty !!!',
+            );
+          }
+          // home
+          elseif ($route == "home" && $uuid == "fetchAll") {
+            $sqlProfile .= " WHERE tb_users.id_user='$id' LIMIT 1";
+            $saldo = mysqli_fetch_assoc(mysqli_query($link,$sqlProfile));
+            $kategori = mysqli_query($link,"SELECT * FROM tb_kategori");
+            if (mysqli_num_rows($kategori) > 0) {
+              $data['home'] = array(
+                'kode' => '1',
+                'message' => 'Fetch All Data',
+                'saldo' => number_format($saldo['saldo']),
+              );
+              while ($k = mysqli_fetch_assoc($kategori)) {
+                $data['home']['kategori'][] = array(
+                  'id' => $k['id_kategori'],
+                  'title' => $k['nama_kategori'],
+                  'icon' => BASE_URL . '/assets/img/icon/' . $k['img']
+                );
+              }
+              $jumlahKuis = mysqli_query($link,"SELECT * FROM tb_kuis WHERE status='1'");
+
+              if (mysqli_num_rows($jumlahKuis) > 25) {
+                $home = array('Event Terkini','Kuis Terbaru','Pilihan Editor','Kuis Terlaris','Kuis Populer');
+
+                foreach ($home as $key => $value) {
+                  $tampilKuis = rand(5,10);
+                  $jmlh = mysqli_num_rows(mysqli_query($link,"SELECT * FROM tb_kuis WHERE status='1'"));
+                  //echo $jmlh;
+                  if ($key == 0) {
+                    $acakKuis = $jmlh > 400 ? rand(1,400) : rand(1,$jmlh);
+                    $sqlKuis = "SELECT tb_kuis.*, tb_rating.*, tb_users.id_user, tb_users.username, tb_kategori.id_kategori, tb_kategori.nama_kategori, tb_mapel.* FROM tb_kuis
+                                LEFT JOIN (SELECT *, AVG(tb_rating.rating) as rate FROM tb_rating GROUP BY id_kuis) tb_rating ON tb_rating.id_kuis = tb_kuis.id_kuis
+                                INNER JOIN tb_users ON tb_users.id_user = tb_kuis.id_user
+                                INNER JOIN tb_kategori ON tb_kategori.id_kategori = tb_kuis.id_kategori
+                                INNER JOIN tb_mapel ON tb_mapel.id_mapel = tb_kuis.id_mapel
+                                WHERE tb_kuis.status='1' AND rate > 3 OR tb_kuis.judul LIKE '%$acakKuis%' ORDER BY RAND() limit 1,$tampilKuis";
+                  }
+                  elseif ($key == 1) {
+                    $acakKuis = $jmlh > 400 && $jmlh < 800 ? rand(401,800) : rand(1,$jmlh);
+                    $sqlKuis = "SELECT tb_kuis.*, tb_rating.*, tb_users.id_user, tb_users.username, tb_kategori.id_kategori, tb_kategori.nama_kategori, tb_mapel.* FROM tb_kuis
+                                LEFT JOIN (SELECT *, AVG(tb_rating.rating) as rate FROM tb_rating GROUP BY id_kuis) tb_rating ON tb_rating.id_kuis = tb_kuis.id_kuis
+                                INNER JOIN tb_users ON tb_users.id_user = tb_kuis.id_user
+                                INNER JOIN tb_kategori ON tb_kategori.id_kategori = tb_kuis.id_kategori
+                                INNER JOIN tb_mapel ON tb_mapel.id_mapel = tb_kuis.id_mapel
+                                WHERE tb_kuis.status='1' AND rate > 3 OR tb_kuis.judul LIKE '%$acakKuis%' ORDER BY RAND() limit 1,$tampilKuis";
+                  }
+                  elseif ($key == 2) {
+                    $acakKuis = $jmlh > 800 && $jmlh < 1200 ? rand(801,1200) : rand(1,$jmlh);
+                    $sqlKuis = "SELECT tb_kuis.*, tb_rating.*, tb_users.id_user, tb_users.username, tb_kategori.id_kategori, tb_kategori.nama_kategori, tb_mapel.* FROM tb_kuis
+                                LEFT JOIN (SELECT *, AVG(tb_rating.rating) as rate FROM tb_rating GROUP BY id_kuis) tb_rating ON tb_rating.id_kuis = tb_kuis.id_kuis
+                                INNER JOIN tb_users ON tb_users.id_user = tb_kuis.id_user
+                                INNER JOIN tb_kategori ON tb_kategori.id_kategori = tb_kuis.id_kategori
+                                INNER JOIN tb_mapel ON tb_mapel.id_mapel = tb_kuis.id_mapel
+                                WHERE tb_kuis.status='1' AND rate > 3 OR tb_kuis.judul LIKE '%$acakKuis%' ORDER BY RAND() limit 1,$tampilKuis";
+                  }
+                  elseif ($key == 3) {
+                    $acakKuis = $jmlh > 1201 && $jmlh < 1600 ? rand(1201,1600) : rand(1,$jmlh);
+                    $sqlKuis = "SELECT tb_kuis.*, tb_rating.*, tb_users.id_user, tb_users.username, tb_kategori.id_kategori, tb_kategori.nama_kategori, tb_mapel.* FROM tb_kuis
+                                LEFT JOIN (SELECT *, AVG(tb_rating.rating) as rate FROM tb_rating GROUP BY id_kuis) tb_rating ON tb_rating.id_kuis = tb_kuis.id_kuis
+                                INNER JOIN tb_users ON tb_users.id_user = tb_kuis.id_user
+                                INNER JOIN tb_kategori ON tb_kategori.id_kategori = tb_kuis.id_kategori
+                                INNER JOIN tb_mapel ON tb_mapel.id_mapel = tb_kuis.id_mapel
+                                WHERE tb_kuis.status='1' AND rate > 3 OR tb_kuis.judul LIKE '%$acakKuis%' ORDER BY RAND() limit 1,$tampilKuis";
+                  }
+                  elseif ($key == 4) {
+                    $acakKuis = $jmlh > 1600 ? rand(1601,$jmlh) : rand(1,$jmlh);
+                    $sqlKuis = "SELECT tb_kuis.*, tb_rating.*, tb_users.id_user, tb_users.username, tb_kategori.id_kategori, tb_kategori.nama_kategori, tb_mapel.* FROM tb_kuis
+                                LEFT JOIN (SELECT *, AVG(tb_rating.rating) as rate FROM tb_rating GROUP BY id_kuis) tb_rating ON tb_rating.id_kuis = tb_kuis.id_kuis
+                                INNER JOIN tb_users ON tb_users.id_user = tb_kuis.id_user
+                                INNER JOIN tb_kategori ON tb_kategori.id_kategori = tb_kuis.id_kategori
+                                INNER JOIN tb_mapel ON tb_mapel.id_mapel = tb_kuis.id_mapel
+                                WHERE tb_kuis.status='1' OR tb_kuis.judul LIKE '%$acakKuis%' ORDER BY RAND() limit 1,$tampilKuis";
+                  }
+
+                  $kuis = mysqli_query($link,$sqlKuis);
+                  if (mysqli_num_rows($kuis) > 0) {
+                    $fetchKuis = array();
+                    while ($r = mysqli_fetch_assoc($kuis)) {
+                      $fetchKuis[] = array(
+                        'author' => $r['username'],
+                        'judul' => $r['judul'],
+                        'slug' => $r['slug'],
+                        'kategori' => $r['nama_kategori'],
+                        'mapel' => $r['nama_mapel'],
+                        'soal' => $r['jumlah_soal'],
+                        'durasi' => $r['durasi'],
+                        'harga' => $r['harga'] == 0 ? 'Gratis' : 'Rp ' . number_format($r['harga']),
+                        'deskripsi' => $r['deskripsi'],
+                        'cover' => $url . '/assets/img/kuis/' . $r['cover'],
+                        'status' => $r['status'],
+                        'rating' => $r['rate'],
+                      );
+                    }
+                    $data['home']['pilihan'][] = array(
+                      'title' => $value,
+                      'jumlah' => mysqli_num_rows($kuis),
+                      'kuis' => $fetchKuis
+                    );
+                  }
+                  else {
+                    $data['home']['pilihan'] = NULL;
+                  }
+                  $data['home']['listKuis'] = array();
+                }
+              }
+              elseif (mysqli_num_rows($jumlahKuis) < 25) {
+                $jmlh = $jumlahKuis;
+                $sqlKuis .= " OR tb_kuis.judul ORDER BY RAND() LIMIT 0,$jmlh";
+                $kuis = mysqli_query($link,$sqlKuis);
+                $listKuis = array();
+                while ($r = mysqli_fetch_assoc($kuis)) {
+                  $listKuis[] = array(
+                    'author' => $r['username'],
+                    'judul' => $r['judul'],
+                    'slug' => $r['slug'],
+                    'kategori' => $r['nama_kategori'],
+                    'mapel' => $r['nama_mapel'],
+                    'soal' => $r['jumlah_soal'],
+                    'durasi' => $r['durasi'],
+                    'harga' => $r['harga'] == 0 ? 'Gratis' : 'Rp ' . number_format($r['harga'],'0',',','.'),
+                    'deskripsi' => $r['deskripsi'],
+                    'cover' => $url . '/assets/img/kuis/' . $r['cover'],
+                    'status' => $r['status'],
+                    'rating' => $r['rate'],
+                  );
+                }
+                $data['home']['pilihan'] = array();
+                $data['home']['listKuis'] = $listKuis;
+              }
+              else {
+                $data['home']['pilihan'] = array();
+              }
+            }
+            else {
+              $data['home'] = array(
+                'kode' => '0',
+                'message' => 'Data is empty !'
+              );
+            }
+          }
+          // kategori
+          elseif ($route == "home" && $uuid == "kategori" && isset($_GET['id'])) {
+            $id = $_GET['id'];
+            $sqlKuis .= " AND rate > 3 AND tb_kuis.id_kategori='$id' ORDER BY RAND()";
+            $kategori = mysqli_query($link,$sqlKuis);
+            if (mysqli_num_rows($kategori) > 0) {
+              $data['home'] = array(
+                'kode' => '1',
+                'message' => mysqli_num_rows($kategori) . " Data"
+              );
+              while ($r = mysqli_fetch_assoc($kategori)) {
+                $data['home']['title'] = $r['nama_kategori'];
+                $data['home']['kuisKategori'][] = array(
+                  'author' => $r['username'],
+                  'judul' => $r['judul'],
+                  'slug' => $r['slug'],
+                  'id_kategori' => $r['id_kategori'],
+                  'nm_kategori' => $r['nama_kategori'],
+                  'mapel' => $r['nama_mapel'],
+                  'soal' => $r['jumlah_soal'],
+                  'durasi' => $r['durasi'],
+                  'harga' => $r['harga'] == 0 ? 'Gratis' : 'Rp ' . number_format($r['harga'],0,',','.'),
+                  'deskripsi' => $r['deskripsi'],
+                  'cover' => $url . '/assets/img/kuis/' . $r['cover'],
+                  'status' => $r['status'],
+                  'rating' => $r['rate'],
+                );
+              }
+            }
+            else {
+              $data['home'] = array(
+                'kode' => '0',
+                'message' => 'Data not found'
+              );
+            }
+          }
+          // detail kuis
+          elseif ($route == "home" && ($uuid == "detailKuis" || $uuid == "scanBarcode") && isset($_GET['slug'])) {
+            $slug = $_GET['slug'];
+            $sqlKuis .= "AND tb_kuis.slug='$slug'";
+            $detail = mysqli_query($link,$sqlKuis);
+            if (mysqli_num_rows($detail) == 1) {
+              $r = mysqli_fetch_assoc($detail);
+              $data['home']['kode'] = '1';
+              $data['home']['kuis'] = array(
+                'author' => $r['username'],
+                'judul' => $r['judul'],
+                'slug' => $r['slug'],
+                'soal' => $r['jumlah_soal'],
+                'durasi' => $r['durasi'],
+                'harga' => $r['harga'] == 0 ? 'Gratis' : 'Rp ' . number_format($r['harga'],'0',',','.'),
+                'deskripsi' => $r['deskripsi'],
+                'rating' => $r['rate'],
+                'cover' => $url . '/assets/img/kuis/' . $r['cover']
+              );
+            }
+            else {
+              $data['home'] = array(
+                'kode' => '0',
+                'message' => 'Quis not found'
+              );
+            }
+          }
+          // cari kuis
+          elseif ($route == "home" && $uuid == "cariKuis" && isset($_GET['q'])) {
+            $q = $_GET['q'];
+            $sqlKuis .= " AND tb_kuis.judul LIKE '%$q%'";
+            $cari = mysqli_query($link,$sqlKuis);
+            if (mysqli_num_rows($cari) > 0) {
+              while ($r = mysqli_fetch_assoc($cari)) {
+                $data['home']['kode'] = '1';
+                $data['home']['kuisCari'][] = array(
+                  'author' => $r['username'],
+                  'judul' => $r['judul'],
+                  'slug' => $r['slug'],
+                  'soal' => $r['jumlah_soal'],
+                  'durasi' => $r['durasi'],
+                  'harga' => $r['harga'] == 0 ? 'Gratis' : 'Rp ' . number_format($r['harga'],'0',',','.'),
+                  'deskripsi' => $r['deskripsi'],
+                  'rating' => $r['rate'],
+                  'cover' => $url . '/assets/img/kuis/' . $r['cover']
+                );
+              }
+            }
+            else {
+              $data['home'] = array(
+                'kode' => '0',
+                'message' => 'Quis not found'
+              );
+            }
+          }
+          // main kuis belum
+          elseif ($route == "home" && $uuid == "mainKuis" && isset($_GET['email']) && isset($_GET['slug'])) {
+            // code...
+          }
+          // submit jawaban belum
+          elseif ($route == "home" && $uuid == "submitJawaban" && isset($_GET['email'])) {
+            // code...
+          }
+          // Top Up Saldo
+          elseif ($route == "home" && $uuid == "topUp" && isset($_GET['email'])) {
+            $email = strip_tags($_GET['email']);
+            $kode = strip_tags($_POST['kode']);
+            if (strlen($kode) < 16 || strlen($kode) > 16) {
+              $data['home'] = array(
+                'kode' => '0',
+                'message' => 'Kode Voucher Harus 16 Angka !'
+              );
+            }
+            elseif (is_numeric($kode)) {
+              $sqlKode = mysqli_query($link,"SELECT * FROM tb_voucher WHERE kode_voucher='$kode' LIMIT 1");
+              if (mysqli_num_rows($sqlKode) == 1) {
+                $checkKode = mysqli_fetch_assoc($sqlKode);
+                $a = $checkKode['status'] == 0 ? 'Aktif' : 'Tidak Aktif';
+                if ($a == "Aktif") {
+                  $jmlh = $checkKode['jumlah'];
+                  $idKode = $checkKode['id_voucher'];
+                  $date = date('Y-m-d H:i:s',strtotime('now'));
+                  $user = mysqli_fetch_assoc(mysqli_query($link,"SELECT id_user,email FROM tb_users WHERE email='$email'"));
+                  $id = $user['id_user'];
+
+                  if ($app == "DEVELOPMENT") {
+                    mysqli_query($link,"UPDATE tb_profile SET saldo=saldo+'$jmlh' WHERE id_user='$id'");
+                    mysqli_query($link,"UPDATE tb_voucher SET status='1' WHERE id_voucher='$idKode'");
+                    mysqli_query($link,"INSERT INTO tb_voucher_user VALUES(NULL,'$idKode','$id','$date')");
+                    $data['home'] = array(
+                      'kode' => '1',
+                      'title' => 'Top Up Saldo',
+                      'message' => 'Top Up Saldo Berhasil Sejumlah ' . $checkKode['jumlah']
+                    );
+                  }
+                  else {
+                    if (substr($kode,0,15) == "000000000000000") {
+                      $data['home'] = array(
+                        'kode' => '0',
+                        'message' => 'Kode Voucher Salah !'
+                      );
+                    }
+                    else {
+                      mysqli_query($link,"UPDATE tb_profile SET saldo=saldo+'$jmlh' WHERE id_user='$id'");
+                      mysqli_query($link,"UPDATE tb_voucher SET status='1' WHERE id_voucher='$idKode'");
+                      mysqli_query($link,"INSERT INTO tb_voucher_user VALUES(NULL,'$idKode','$id','$date')");
+                      $data['home'] = array(
+                        'kode' => '1',
+                        'title' => 'Top Up Saldo',
+                        'message' => 'Top Up Saldo Berhasil Sejumlah ' . $checkKode['jumlah']
+                      );
+                    }
+                  }
+                }
+                else {
+                  $data['home'] = array(
+                    'kode' => '0',
+                    'message' => 'Kode Voucher Sudah digunakan !'
+                  );
+                }
+              }
+              else {
+                $data['home'] = array(
+                  'kode' => '0',
+                  'message' => 'Kode Voucher Salah !'
+                );
+              }
+            }
+            else {
+              $data['home'] = array(
+                'kode' => '0',
+                'message' => 'Kode Voucher Harus Angka !'
+              );
+            }
+          }
+          // History Top Up
+          elseif ($route == "home" && $uuid == "historyTopUp" && isset($_GET['email'])) {
+            $email = $_GET['email'];
+            $sqlProfile .= " WHERE tb_users.email='$email'";
+            $exc = mysqli_fetch_assoc(mysqli_query($link,$sqlProfile));
+            $id = $exc['id_user'];
+            $sqlHistory = mysqli_query($link, "SELECT tb_voucher_user.*, tb_voucher.* FROM tb_voucher_user INNER JOIN tb_voucher ON tb_voucher.id_voucher = tb_voucher_user.id_voucher
+                WHERE tb_voucher_user.id_user='$id'");
+            if (mysqli_num_rows($sqlHistory) > 0) {
+              $i = 1;
+              while ($r = mysqli_fetch_assoc($sqlHistory)) {
+                $data['home']['kode'] = '1';
+                $data['home']['saldo'] = number_format($exc['saldo']);
+                $data['home']['historyTopUp'][] = array(
+                  'nomor' => $i++.".",
+                  'jumlah' => "Top Up Saldo sebesar " . number_format($r['jumlah']),
+                  'tanggal' => date('d-m-Y', strtotime($r['created_at']))
+                );
+              }
+            }
+            else {
+              $data['home'] = array(
+                'kode' => '0',
+                'message' => 'Belum Pernah Top Up Saldo'
+              );
+            }
+          }
+          // Submit Feedback
+          elseif ($route == "home" && $uuid == "feedback" && isset($_GET['email'])) {
+            $info = $_POST['info'];
+            $rate = $_POST['rating'];
+            $email = $_GET['email'];
+            $sqlProfile .= " WHERE tb_users.email='$email' LIMIT 1";
+            $exec = mysqli_fetch_assoc(mysqli_query($link,$sqlProfile));
+            $id = $exec['id_user'];
+            $date = date('Y-m-d H:i:s',strtotime('now'));
+            $sqlFeedback = mysqli_query($link,"INSERT INTO tb_feedback VALUES(NULL,'$id','$info','$rate','$date')");
+            if ($sqlFeedback) {
+              $data['home'] = array(
+                'kode' => '0',
+                'title' => 'Success',
+                'message' => 'Terima Kasih telah mengirimkan feedback anda '
+              );
+            }
+            else {
+              $data['home'] = array(
+                'kode' => '0',
+                'title' => 'Error',
+                'message' => mysqli_error($link)
+              );
+            }
+          }
+          // Detail Profile
+          elseif ($route == "home" && $uuid == "profileUser" && isset($_GET['email'])) {
+            $email = $_GET['email'];
+            $sqlProfile .= " WHERE tb_users.email='$email' LIMIT 1";
+            $exec = mysqli_query($link,$sqlProfile);
+            if ($exec) {
+              $r = mysqli_fetch_assoc($exec);
+              $data['home']['kode'] = '1';
+              $data['home']['user'] = array(
+                'nama' => $r['nama'],
+                'username' => $r['username'],
+                'email' => $r['email'],
+                'level' => ucwords($r['nama_level']),
+                'lahir' => $r['tgl_lahir'] != NULL ? date('d-m-Y', strtotime($r['tgl_lahir'])) : '-',
+                'kelamin' => $r['jk'],
+                'no' => $r['no_hp'] ?? $r['no_hp'],
+                'almt' => $r['almt'] ?? $r['almt'],
+                'saldo' => "Rp. " . number_format($r['saldo']),
+                'bank' => $r['nama_bank'] ?? $r['nama_bank'],
+                'rek' => $r['no_rek'] ?? $r['no_rek'],
+                'atasNama' => $r['atas_nama'] ?? $r['atas_nama']
+              );
+            }
+            else {
+              $data['home'] = array(
+                'kode' => '0',
+                'message' => mysqli_error($link)
+              );
+            }
+          }
+          // Update Profile
+          elseif ($route == "home" && $uuid == "ubahProfile" && isset($_GET['email'])) {
+            $email = $_GET['email'];
+
+            $mail = $_POST['mail'];
+            $nama = $_POST['nama'];
+            $tgl = date('Y-m-d', strtotime($_POST['tgl']));
+            $klm = $_POST['jk'];
+            $no = $_POST['no'];
+            $almt = $_POST['almt'];
+            $nmBank = $_POST['nama_bank'];
+            $noRek = $_POST['no_rek'];
+            $anBank = $_POST['atas_nama'];
+            $date = date('Y-m-d H:i:s', strtotime('now'));
+
+            $sqlProfile .= " WHERE tb_users.email='$email' LIMIT 1";
+            $exec = mysqli_query($link,$sqlProfile);
+            $r = mysqli_fetch_assoc($exec);
+            $id = $r['id_user'];
+
+            if ($email !== $mail) {
+              $checkEmail = mysqli_query($link,"SELECT email FROM tb_users WHERE email='$mail' LIMIT 1");
+              if (mysqli_num_rows($checkEmail) == 1) {
+                $data['home'] = array(
+                  'kode' => '0',
+                  'message' => 'Email telah digunakan. Harap menggunakan Email lain'
+                );
+              }
+              else {
+                $token = hash('sha512',time());
+                $tipeUrl = base64_encode('re-verification-email');
+                $exp = date('Y-m-d H:i:s',strtotime('+1 hour'));
+                $body = '
+                Hi, '.$nama.' !<br>
+                You have requested your MAP email to be changed. Please click the following link to verification email :<br>
+
+                Please click bottom button this link to changed email your account:<br>
+                <a href="'.$url.'/verification?t='.$tipeUrl.'&e='.base64_encode($mail).'&_token='.$token.'">Click here !</a><br>or copy link below<br>
+                '.$url.'/verification?t='.$tipeUrl.'&e='.base64_encode($mail).'&_token='.$token.'<br>
+                This link will expire in 1 hour.<br>
+
+                thanks, '.$appName.'</br>
+                ';
+                $mail1 = new PHPMailer(true);
+
+                try {
+                  $mail1->isSMTP();
+                  $mail1->Host = 'mail.kukitriplan.com';
+                  $mail1->SMTPAuth = true;
+                  $mail1->Username = 'no-reply@kukitriplan.com';
+                  $mail1->Password = 'wl5IE#U0AwRv';
+                  $mail1->SMTPSecure = 'tls';
+                  $mail1->Port = 587;
+
+                  $mail1->setFrom('no-reply@kukitriplan.com', APPNAME);
+                  $mail1->addAddress($mail, $nama);
+
+                  $mail1->isHTML(true);
+                  $mail1->Subject = "Change Email Account";
+                  $mail1->Body    = $body;
+                  //$mail->send();
+                  if ($mail1->send()) {
+                    $sql = mysqli_query($link,"UPDATE tb_token SET access_token=NULL, verify_token='$token', expried_in='$exp', updated_at='$date' WHERE id_user='$id'");
+                    mysqli_query($link,"UPDATE tb_users SET email='$mail', status='1', updated_at='$date' WHERE email='$email'");
+                    mysqli_query($link,"UPDATE tb_profile SET nama='$nama', tgl_lahir='$tgl', jk='$klm', no_hp='$no', almt='$almt', nama_bank='$nmBank', no_rek='$noRek', atas_nama='$anBank', updated_at='$date' WHERE id_user='$id'");
+                    if ($sql) {
+                      $data['home'] = array(
+                        'kode' => '1',
+                        'setLogin' => true,
+                        'message' => 'Lakukan Verifikasi email akun melalui email yang dikirim ! Jika tidak ada masuk, silahkan cek spam !'
+                      );
+                    }
+                    else {
+                      $data['home'] = array(
+                        'kode' => '0',
+                        'message' => mysqli_error($link),
+                      );
+                    }
+                  }
+                  else {
+                    $data['home'] = array(
+                      'kode' => '0',
+                      'message' => 'Message could not be sent. Mailer Error: ' . $mail->ErrorInfo
+                    );
+                  }
+                }
+                catch(Exception $e) {
+                  $data['home'] = array(
+                    'kode' => '0',
+                    'message' => 'Message could not be sent. Mailer Error: ' . $mail->ErrorInfo
+                  );
+                }
+              }
+            }
+            else {
+              $update = mysqli_query($link,"UPDATE tb_profile SET nama='$nama', tgl_lahir='$tgl', jk='$klm', no_hp='$no', almt='$almt', nama_bank='$nmBank', no_rek='$noRek', atas_nama='$anBank', updated_at='$date' WHERE id_user='$id'");
+              if ($update) {
+                $data['home'] = array(
+                  'kode' => '1',
+                  'message' => 'Data berhasil diperbarui !'
+                );
+              }
+              else {
+                $data['home'] = array(
+                  'kode' => '0',
+                  'message' => mysqli_query($link)
+                );
+              }
+            }
+
+          }
+          // Update password belom
+          elseif ($route == "home" && $uuid == "ubahPassword" && isset($_GET['email'])) {
+            // code...
+          }
+          elseif ($route == "home" && $uuid == "historyKuis" && isset($_GET['email'])) {
+            $email = $_GET['email'];
+            $sqlProfile .= " WHERE tb_users.email='$email' LIMIT 1";
+            $exec = mysqli_fetch_assoc(mysqli_query($link,$sqlProfile));
+            $id = $exec['id_user'];
+            $sqlHistoryKuis = "SELECT tb_kuis.id_kuis, tb_kuis.judul, tb_kuis.harga, tb_kuis.jumlah_soal, tb_kuis.durasi,
+                               tb_nilai.*, tb_users.id_user, tb_profile.id_user, tb_profile.nama, tb_rating.* FROM tb_nilai
+                               INNER JOIN tb_kuis ON tb_nilai.id_kuis = tb_kuis.id_kuis
+                               LEFT JOIN (SELECT *, AVG(tb_rating.rating) as rate FROM tb_rating GROUP BY id_kuis) tb_rating ON tb_rating.id_kuis = tb_kuis.id_kuis
+                               INNER JOIN tb_users ON tb_nilai.id_user = tb_users.id_user
+                               INNER JOIN tb_profile ON tb_profile.id_user = tb_users.id_user
+                               WHERE tb_nilai.id_user='$id' ORDER BY tb_nilai.created_at DESC";
+            $exec = mysqli_query($link,$sqlHistoryKuis);
+            if (mysqli_num_rows($exec) > 0) {
+              $i = 1;
+              while ($r = mysqli_fetch_assoc($exec)) {
+                $data['home']['kode'] = '1';
+                $data['home']['historyKuis'][] = array(
+                  'idNilai' => $r['id_nilai'],
+                  'nomor' => $i++.".",
+                  'namaKuis' => $r['judul'],
+                  'nilai' => $r['nilai'],
+                  'harga' => $r['harga'] != 0 ? 'Rp. ' . number_format($r['harga']) : 'Gratis',
+                  'soal' => $r['jumlah_soal'],
+                  'durasi' => $r['durasi'],
+                  'benar' => $r['jumlah_benar'],
+                  'salah' => $r['jumlah_salah'],
+                  'waktu' => $r['sisa_waktu'],
+                  'tanggal' => date('d-m-Y, H:i:s',strtotime($r['created_at'])),
+                  'rating' => $r['rating']
+                );
+              }
+            }
+            else {
+              $data['home'] = array(
+                'kode' => '0',
+                'message' => 'Belum pernah ikut kuis'
+              );
+            }
+          }
+        }
+        else {
+          $data['home'] = array(
+            'kode' => '0',
+            'message' => 'Invalid URL',
+          );
+        }
+      }
+      else {
+        $data['home'] = array(
+          'kode' => '0',
+          'message' => 'Expried session. Login Again !',
+          'setLogin' => true
+        );
+      }
     }
     else {
       $data['home'] = array(
         'kode' => '0',
-        'message' => 'Access Forbidden',
+        'message' => 'Expried session. Login Again !',
         'setLogin' => true
       );
     }
@@ -29,9 +619,10 @@
   else {
     $data['home'] = array(
       'kode' => '0',
-      'message' => 'Expried session. Login Again !',
+      'message' => 'Invalid Token !',
       'setLogin' => true
     );
   }
+
 
   echo json_encode($data);

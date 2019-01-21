@@ -1,3 +1,4 @@
+<?php include_once 'master/header.php'; ?>
         <div class="login-box-body">
           <p class="login-box-msg">Forget Password, input your email</p>
           <div id="message"></div>
@@ -14,5 +15,6 @@
             </div>
           </form>
           Have an account ? &nbsp;<a href="<?= BASE_URL . '/'; ?>">Login</a> <br>
-          Haven't an account ? &nbsp;<a href="<?= BASE_URL . '/'; ?>">Register</a>
+          Haven't an account ? &nbsp;<a href="<?= BASE_URL . '/register'; ?>">Register</a>
         </div>
+<?php include_once 'master/footer.php'; ?>

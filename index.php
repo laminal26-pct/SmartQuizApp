@@ -1,5 +1,5 @@
 <?php
-  include_once 'resources/frontend/master/header.php';
+  /*include_once 'resources/frontend/master/header.php';
 
   if (@$_REQUEST['menu']) {
     if (@$_REQUEST['menu'] == "login") {
@@ -26,4 +26,6 @@
   }
 
   include_once 'resources/frontend/master/footer.php';
+  */
+  header('location: login');
 ?>

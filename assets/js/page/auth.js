@@ -51,7 +51,7 @@ $(document).ready(function () {
         $('input[type=submit]').attr('disabled','disabled');
       },
       success: function(response) {
-        if (response.login.kode == "1") {
+        if (response.auth.kode == "1") {
           $('input[type=submit]').attr('disabled','disabled');
           setTimeout('window.location.href = "dashboard"; ',2000);
         } else {
@@ -64,7 +64,7 @@ $(document).ready(function () {
             $input.eq(0).val('');
             $input.eq(1).val('');
             $('div#loading').hide();
-            $('div#message').addClass('alert alert-danger').html('<span class="glyphicon glyphicon-info-sign"></span> &nbsp; '+response.login.message);
+            $('div#message').addClass('alert alert-danger').html('<span class="glyphicon glyphicon-info-sign"></span> &nbsp; '+response.auth.message);
           });
         }
       }
@@ -139,7 +139,7 @@ $(document).ready(function () {
         $('input[type=submit]').attr('disabled','disabled');
       },
       success: function(response) {
-        if (response.register.kode == "1") {
+        if (response.auth.kode == "1") {
           $('#message').fadeIn(500, function() {
             $('input[type=submit]').attr('disabled','disabled');
             $formGroup.eq(0).removeClass('has-success');
@@ -150,7 +150,7 @@ $(document).ready(function () {
             $input.eq(1).val('');
             $input.eq(2).val('');
             $('div#loading').hide();
-            $('div#message').addClass('alert alert-success').html('<span class="glyphicon glyphicon-info-sign"></span> &nbsp; '+response.register.message);
+            $('div#message').addClass('alert alert-success').html('<span class="glyphicon glyphicon-info-sign"></span> &nbsp; '+response.auth.message);
           });
         } else {
           $('#message').fadeIn(500, function() {
@@ -167,7 +167,7 @@ $(document).ready(function () {
             $input.eq(1).val('');
             $input.eq(2).val('');
             $('div#loading').hide();
-            $('div#message').addClass('alert alert-danger').html('<span class="glyphicon glyphicon-info-sign"></span> &nbsp; '+response.register.message);
+            $('div#message').addClass('alert alert-danger').html('<span class="glyphicon glyphicon-info-sign"></span> &nbsp; '+response.auth.message);
           });
         }
       }
@@ -209,13 +209,13 @@ $(document).ready(function () {
         $('input[type=submit]').attr('disabled','disabled');
       },
       success: function(response) {
-        if (response.forget.kode == "1") {
+        if (response.auth.kode == "1") {
           $('#message').fadeIn(500, function() {
             $('input[type=submit]').attr('disabled','disabled');
             $formGroup.eq(0).removeClass('has-success');
             $input.eq(0).val('');
             $('div#loading').hide();
-            $('div#message').addClass('alert alert-success').html('<span class="glyphicon glyphicon-info-sign"></span> &nbsp; '+response.forget.message);
+            $('div#message').addClass('alert alert-success').html('<span class="glyphicon glyphicon-info-sign"></span> &nbsp; '+response.auth.message);
           });
         } else {
           $('#message').fadeIn(500, function() {
@@ -224,7 +224,7 @@ $(document).ready(function () {
             $formGroup.eq(0).addClass('has-error');
             $input.eq(0).val('');
             $('div#loading').hide();
-            $('div#message').addClass('alert alert-danger').html('<span class="glyphicon glyphicon-info-sign"></span> &nbsp; '+response.forget.message);
+            $('div#message').addClass('alert alert-danger').html('<span class="glyphicon glyphicon-info-sign"></span> &nbsp; '+response.auth.message);
           });
         }
       }
@@ -258,7 +258,7 @@ $(document).ready(function () {
     var pass = $('#reset-password').serialize();
     $input = $('#reset-password').find('input[type=password]');
     $.ajax({
-      url: '../../reset-password',
+      url: 'api/v1/reset-password',
       type: 'POST',
       async: false,
       data: pass,
@@ -268,14 +268,14 @@ $(document).ready(function () {
         $('input[type=submit]').attr('disabled','disabled');
       },
       success: function(response) {
-        if (response.reset.kode == "1") {
+        if (response.auth.kode == "1") {
           $('#message').fadeIn(500, function() {
             $('input[type=submit]').attr('disabled','disabled');
             $formGroup.eq(0).addClass('has-success');
             $formGroup.eq(0).removeClass('has-error');
             $input.eq(0).val('');
             $('div#loading').hide();
-            $('div#message').addClass('alert alert-success').html('<span class="glyphicon glyphicon-info-sign"></span> &nbsp; '+response.reset.message);
+            $('div#message').addClass('alert alert-success').html('<span class="glyphicon glyphicon-info-sign"></span> &nbsp; '+response.auth.message);
           });
         } else {
           $('#message').fadeIn(500, function() {
@@ -284,7 +284,7 @@ $(document).ready(function () {
             $formGroup.eq(0).addClass('has-error');
             $input.eq(0).val('');
             $('div#loading').hide();
-            $('div#message').addClass('alert alert-danger').html('<span class="glyphicon glyphicon-info-sign"></span> &nbsp; '+response.reset.message);
+            $('div#message').addClass('alert alert-danger').html('<span class="glyphicon glyphicon-info-sign"></span> &nbsp; '+response.auth.message);
           });
         }
       }

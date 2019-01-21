@@ -1,6 +1,6 @@
 <?php
   session_start();
-  require_once 'path.php';
+  require_once '../../path.php';
   require_once (ABSPATH . 'config/config.php');
   require_once (ABSPATH . 'config/database.php');
   $url = BASE_URL;
