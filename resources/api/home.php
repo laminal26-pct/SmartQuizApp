@@ -88,7 +88,7 @@
                                 INNER JOIN tb_users ON tb_users.id_user = tb_kuis.id_user
                                 INNER JOIN tb_kategori ON tb_kategori.id_kategori = tb_kuis.id_kategori
                                 INNER JOIN tb_mapel ON tb_mapel.id_mapel = tb_kuis.id_mapel
-                                WHERE tb_kuis.status='1' AND rate > 3 OR tb_kuis.judul LIKE '%$acakKuis%' ORDER BY RAND() limit 1,$tampilKuis";
+                                WHERE tb_kuis.status='1' OR tb_kuis.judul LIKE '%$acakKuis%' ORDER BY RAND() limit 1,$tampilKuis";
                   }
                   elseif ($key == 2) {
                     $acakKuis = $jmlh > 800 && $jmlh < 1200 ? rand(801,1200) : rand(1,$jmlh);
@@ -134,7 +134,7 @@
                         'deskripsi' => $r['deskripsi'],
                         'cover' => $url . '/assets/img/kuis/' . $r['cover'],
                         'status' => $r['status'],
-                        'rating' => $r['rate'],
+                        'rating' => $r['rate'] != NULL ? $r['rate'] : '0'
                       );
                     }
                     $data['home']['pilihan'][] = array(
@@ -150,7 +150,7 @@
                 }
               }
               elseif (mysqli_num_rows($jumlahKuis) < 25) {
-                $jmlh = $jumlahKuis;
+                $jmlh = $jmlh = mysqli_num_rows(mysqli_query($link,"SELECT * FROM tb_kuis WHERE status='1'")) < 0 ? '0' : mysqli_num_rows(mysqli_query($link,"SELECT * FROM tb_kuis WHERE status='1'"));
                 $sqlKuis .= " OR tb_kuis.judul ORDER BY RAND() LIMIT 0,$jmlh";
                 $kuis = mysqli_query($link,$sqlKuis);
                 $listKuis = array();
@@ -167,7 +167,7 @@
                     'deskripsi' => $r['deskripsi'],
                     'cover' => $url . '/assets/img/kuis/' . $r['cover'],
                     'status' => $r['status'],
-                    'rating' => $r['rate'],
+                    'rating' => $r['rate'] != NULL ? $r['rate'] : '0',
                   );
                 }
                 $data['home']['pilihan'] = array();
@@ -209,7 +209,7 @@
                   'deskripsi' => $r['deskripsi'],
                   'cover' => $url . '/assets/img/kuis/' . $r['cover'],
                   'status' => $r['status'],
-                  'rating' => $r['rate'],
+                  'rating' => $r['rate'] != NULL ? $r['rate'] : '0',
                 );
               }
             }
@@ -236,7 +236,7 @@
                 'durasi' => $r['durasi'],
                 'harga' => $r['harga'] == 0 ? 'Gratis' : 'Rp ' . number_format($r['harga'],'0',',','.'),
                 'deskripsi' => $r['deskripsi'],
-                'rating' => $r['rate'],
+                'rating' => $r['rate'] != NULL ? $r['rate'] : '0',
                 'cover' => $url . '/assets/img/kuis/' . $r['cover']
               );
             }
@@ -263,7 +263,7 @@
                   'durasi' => $r['durasi'],
                   'harga' => $r['harga'] == 0 ? 'Gratis' : 'Rp ' . number_format($r['harga'],'0',',','.'),
                   'deskripsi' => $r['deskripsi'],
-                  'rating' => $r['rate'],
+                  'rating' => $r['rate'] != NULL ? $r['rate'] : '0',
                   'cover' => $url . '/assets/img/kuis/' . $r['cover']
                 );
               }
@@ -602,7 +602,7 @@
       }
       else {
         $data['home'] = array(
-          'kode' => '0',
+          'kode' => '2',
           'message' => 'Expried session. Login Again !',
           'setLogin' => true
         );
@@ -610,7 +610,7 @@
     }
     else {
       $data['home'] = array(
-        'kode' => '0',
+        'kode' => '2',
         'message' => 'Expried session. Login Again !',
         'setLogin' => true
       );
@@ -618,7 +618,7 @@
   }
   else {
     $data['home'] = array(
-      'kode' => '0',
+      'kode' => '2',
       'message' => 'Invalid Token !',
       'setLogin' => true
     );
