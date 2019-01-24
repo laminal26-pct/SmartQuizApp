@@ -484,14 +484,14 @@
 
                 try {
                   $mail1->isSMTP();
-                  $mail1->Host = 'mail.kukitriplan.com';
+                  $mail1->Host = MAIL_HOST;
                   $mail1->SMTPAuth = true;
-                  $mail1->Username = 'no-reply@kukitriplan.com';
-                  $mail1->Password = 'wl5IE#U0AwRv';
-                  $mail1->SMTPSecure = 'tls';
-                  $mail1->Port = 587;
+                  $mail1->Username = MAIL_USERNAME;
+                  $mail1->Password = MAIL_PASSWORD;
+                  $mail1->SMTPSecure = MAIL_ENCRYPTION;
+                  $mail1->Port = MAIL_PORT;
 
-                  $mail1->setFrom('no-reply@kukitriplan.com', APPNAME);
+                  $mail1->setFrom(MAIL_USERNAME, APPNAME);
                   $mail1->addAddress($mail, $nama);
 
                   $mail1->isHTML(true);

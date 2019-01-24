@@ -2,7 +2,7 @@
 // Configuration Apps
 define('APPDEBUG', 'DEVELOPMENT'); // DEVELOPMENT for Build Apps And PRODUCTION for Release Apps
 define('APPNAME', 'SMART QUIZ APP');
-define('BASE_URL', 'http://192.168.43.190/SmartQuizApp'); // URL Apps
+define('BASE_URL', 'http://172.20.10.2/SmartQuizApp'); // URL Apps
 define('TIMEZONE', 'Asia/Jakarta'); // Timezone Apps
 
 // Configuration Database
@@ -14,11 +14,11 @@ define('DB_PASSWORD', '');
 
 // Configuration Mailler
 define('MAIL_DRIVER', 'smtp');
-define('MAIL_HOST', 'smtp.mailtrap.io');
-define('MAIL_PORT', '2525');
-define('MAIL_USERNAME', null);
-define('MAIL_PASSWORD', null);
-define('MAIL_ENCRYPTION', null);
+define('MAIL_HOST', 'mail.kukitriplan.com');
+define('MAIL_PORT', '587');
+define('MAIL_USERNAME', 'noreply@kukitriplan.com');
+define('MAIL_PASSWORD', '}Ej7o#q}tWGK');
+define('MAIL_ENCRYPTION', 'tls');
 
 $directoryURI = $_SERVER['REQUEST_URI'];
 $path = parse_url($directoryURI, PHP_URL_PATH);

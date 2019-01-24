@@ -191,14 +191,14 @@
             $mail = new PHPMailer(true);
             try {
               $mail->isSMTP();
-              $mail->Host = 'mail.kukitriplan.com';
+              $mail->Host = MAIL_HOST;
               $mail->SMTPAuth = true;
-              $mail->Username = 'no-reply@kukitriplan.com';
-              $mail->Password = 'wl5IE#U0AwRv';
-              $mail->SMTPSecure = 'tls';
-              $mail->Port = 587;
+              $mail->Username = MAIL_USERNAME;
+              $mail->Password = MAIL_PASSWORD;
+              $mail->SMTPSecure = MAIL_ENCRYPTION;
+              $mail->Port = MAIL_PORT;
 
-              $mail->setFrom('no-reply@kukitriplan.com', APPNAME);
+              $mail->setFrom(MAIL_USERNAME, APPNAME);
               $mail->addAddress($c, $b);
 
               $mail->isHTML(true);
@@ -283,14 +283,14 @@
             $mail = new PHPMailer(true);
             try {
               $mail->isSMTP();
-              $mail->Host = 'mail.kukitriplan.com';
+              $mail->Host = MAIL_HOST;
               $mail->SMTPAuth = true;
-              $mail->Username = 'no-reply@kukitriplan.com';
-              $mail->Password = 'wl5IE#U0AwRv';
-              $mail->SMTPSecure = 'tls';
-              $mail->Port = 587;
+              $mail->Username = MAIL_USERNAME;
+              $mail->Password = MAIL_PASSWORD;
+              $mail->SMTPSecure = MAIL_ENCRYPTION;
+              $mail->Port = MAIL_PORT;
 
-              $mail->setFrom('no-reply@kukitriplan.com', APPNAME);
+              $mail->setFrom(MAIL_USERNAME, APPNAME);
               $mail->addAddress($a, $name);
 
               $mail->isHTML(true);
