@@ -66,12 +66,6 @@
           }
           // tambah kuis
           elseif ($route == "dashboard" && $uuid == "simpanKuis" && isset($_GET['email'])) {
-            /* note
-             * membuat folder cover kuis berdasarkan slug
-             * mengupload gambar ke folder cover kuis berdasarkan slug
-             * menyimpan data kuis
-             * call back ke tambah soal berdasarkan idKuis
-             */
             $email = $_GET['email'];
             $idKategori = $_POST['idKategori'];
             $tmplBahas = $_POST['tmplBahas'];
@@ -97,7 +91,7 @@
              $dataCover = base64_decode($cover);
              $fileName = uniqid() . '.png';
              $file .= $fileName;
-             file_put_contents($file,$fileName);
+             file_put_contents($file,$dataCover);
             }
             $sqlProfile .= " WHERE tb_users.email='$email'";
             $r = mysqli_fetch_assoc(mysqli_query($link,$sqlProfile));
@@ -137,8 +131,8 @@
             $pilihanC = $_POST['pilihanC'];
             $pilihanD = $_POST['pilihanD'];
             $pilihanE = $_POST['pilihanE'];
-            $jawaban = $_POST['jawaban'];
-            $bahas = $_POST['bahas'] != NULL ? $_POST['bahas'] : NULL;
+            $jawaban = strtolower($_POST['jawaban']);
+            $bahas = $_POST['bahas'] != NULL ? $_POST['bahas'] : '';
             $sqlSoal = mysqli_query($link,"INSERT INTO tb_soal VALUES(NULL,'$idKuis','$soal','$pilihanA','$pilihanB','$pilihanC','$pilihanD','$pilihanE','$jawaban','$bahas')");
             if ($sqlSoal) {
               $nomorSoal = mysqli_num_rows(mysqli_query($link,"SELECT * FROM tb_soal WHERE id_kuis='$idKuis'"));
@@ -159,7 +153,48 @@
           }
           // list kuis
           elseif ($route == "dashboard" && $uuid == "listKuis" && isset($_GET['email'])) {
-            # code...
+            $email = $_GET['email'];
+            $sqlProfile .= " WHERE tb_users.email='$email' LIMIT 1";
+            $r = mysqli_fetch_assoc(mysqli_query($link,$sqlProfile));
+            $id = $r['id_user'];
+            $sqlKuisAuthor = "SELECT tb_kuis.*, tb_rating.*, tb_users.id_user, tb_users.username, tb_kategori.id_kategori, tb_kategori.nama_kategori, tb_mapel.*, tb_soal.* FROM tb_kuis
+                              LEFT JOIN (SELECT *, AVG(tb_rating.rating) as rate FROM tb_rating GROUP BY id_kuis) tb_rating ON tb_rating.id_kuis = tb_kuis.id_kuis
+                              INNER JOIN tb_users ON tb_users.id_user = tb_kuis.id_user
+                              INNER JOIN tb_kategori ON tb_kategori.id_kategori = tb_kuis.id_kategori
+                              INNER JOIN tb_mapel ON tb_mapel.id_mapel = tb_kuis.id_mapel
+                              LEFT JOIN (SELECT id_kuis, COUNT(*) as nomorSoal FROM tb_soal GROUP BY id_kuis) tb_soal ON tb_soal.id_kuis = tb_kuis.id_kuis
+                              WHERE tb_users.id_user='$id' ORDER BY tb_kuis.created_at DESC";
+            $exec = mysqli_query($link,$sqlKuisAuthor);
+            if (mysqli_num_rows($exec) > 0) {
+              $i = 1;
+              while ($r = mysqli_fetch_assoc($exec)) {
+                $data['dashboard']['kode'] = '1';
+                $data['dashboard']['kuisList'][] = array(
+                  'nomor' => $i++.".",
+                  'judul' => $r['judul'],
+                  'slug' => $r['slug'],
+                  'author' => $r['username'],
+                  'judul' => $r['judul'],
+                  'slug' => $r['slug'],
+                  'soal' => $r['jumlah_soal'],
+                  'durasi' => $r['durasi'],
+                  'harga' => $r['harga'] == 0 ? 'Gratis' : 'Rp ' . number_format($r['harga'],'0',',','.'),
+                  'cover' => $url . '/assets/img/kuis/' . $r['cover'],
+                  'deskripsi' => $r['deskripsi'],
+                  'nm_kategori' => $r['nama_kategori'],
+                  'nm_mapel' => $r['nama_mapel'],
+                  'status' => $r['status'] == 1 ? 'Aktif' : 'Tidak Aktif',
+                  'rating' => $r['rate'] != NULL ? $r['rate'] : 0,
+                  'nomorSoal' => $r['nomorSoal'] == 0 ? 1 : $r['nomorSoal']+1
+                );
+              }
+            }
+            else {
+              $data['dashboard'] = array(
+                'kode' => '0',
+                'message' => 'Belum Ada Kuis'
+              );
+            }
           }
           // detail & edit kuis
           elseif ($route == "dashboard" && ($uuid == "detailKuis" || $uuid == "editKuis") && isset($_GET['idKuis'])) {
@@ -167,19 +202,126 @@
           }
           // hapus kuis
           elseif ($route == "dashboard" && $uuid == "hapusKuis" && isset($_GET['idKuis'])) {
-            # code...
+            $id = $_GET['id'];
+            $sqlSoal = mysqli_query($link,"DELETE FROM tb_soal WHERE id_kuis='$id'");
+            $sqlKuis = mysqli_query($link,"DELETE FROM tb_kuis WHERE id_kuis='$id'");
+            if ($sqlSoal && $sqlKuis) {
+              $data['dashboard'] = array(
+                'kode' => '1',
+                'message' => 'Kuis berhasil dihapus !'
+              );
+            }
+            else {
+              $data['dashboard'] = array(
+                'kode' => '0',
+                'message' => mysqli_error($link)
+              );
+            }
           }
           // list soal
-          elseif ($route == "dashboard" && $uuid == "listSoal" && isset($_GET['idKuis'])) {
-            # code...
+          elseif ($route == "dashboard" && $uuid == "listSoal" && isset($_GET['slug'])) {
+            $slug = $_GET['slug'];
+            $sqlKuis = "SELECT tb_kuis.slug, tb_kuis.id_kuis, tb_kuis.judul, tb_soal.* FROM tb_soal INNER JOIN tb_kuis ON tb_kuis.id_kuis = tb_soal.id_kuis WHERE tb_kuis.slug='$slug'";
+            $exec = mysqli_query($link,$sqlKuis);
+            if (mysqli_num_rows($exec) > 0) {
+              $i = 1;
+              while ($r = mysqli_fetch_assoc($exec)) {
+                $data['dashboard']['kode'] = '1';
+                $data['dashboard']['jumlahSoal'] = mysqli_num_rows($exec);
+                $data['dashboard']['title'] = $r['judul'];
+                $data['dashboard']['soalList'][] = array(
+                  'nomorSoal' => $i++.".",
+                  'idSoal' => $r['id_soal'],
+                  'judulSoal' => $r['judul_soal'],
+                  'A' => $r['a'],
+                  'B' => $r['b'],
+                  'C' => $r['c'],
+                  'D' => $r['d'],
+                  'E' => $r['e'],
+                  'kunciJawaban' => strtoupper($r['kunci'])
+                );
+              }
+            }
+            else {
+              $r = mysqli_fetch_assoc(mysqli_query($link,"SELECT slug, judul FROM tb_kuis WHERE slug='$slug'"));
+              $data['dashboard'] = array(
+                'kode' => '0',
+                'jumlahSoal' => mysqli_num_rows($exec),
+                'title' => $r['judul'],
+                'message' => 'Data Soal Kosong',
+                'soalList' => array()
+              );
+            }
           }
-          // detail & edit soal
-          elseif ($route == "dashboard" && ($uuid == "detailSoal" || $uuid == "editSoal") && isset($_GET['idSoal'])) {
-            # code...
+          // edit soal
+          elseif ($route == "dashboard" && $uuid == "editSoal" && isset($_GET['idSoal'])) {
+            $id = $_GET['idSoal'];
+            $sqlSoal = mysqli_query($link,"SELECT * FROM tb_soal WHERE id_soal='$id'");
+            if ($sqlSoal) {
+              $r = mysqli_fetch_assoc($sqlSoal);
+              $data['dashboard'] = array(
+                'kode' => '1',
+                'soal' => array(
+                  'idSoal' => $r['id_soal'],
+                  'judulSoal' => $r['judul_soal'],
+                  'A' => $r['a'],
+                  'B' => $r['b'],
+                  'C' => $r['c'],
+                  'D' => $r['d'],
+                  'E' => $r['e'],
+                  'kunciJawaban' => strtolower($r['kunci'])
+                )
+              );
+            }
+            else {
+              $data['dashboard'] = array(
+                'kode' => '0',
+                'message' => mysqli_error($link)
+              );
+            }
+          }
+          // ubah soal
+          elseif ($route == "dashboard" && $uuid == "ubahSoal" && isset($_GET['idSoal'])) {
+            $id = $_GET['idSoal'];
+            $soal = $_POST['soal'];
+            $pilihanA = $_POST['pilihanA'];
+            $pilihanB = $_POST['pilihanB'];
+            $pilihanC = $_POST['pilihanC'];
+            $pilihanD = $_POST['pilihanD'];
+            $pilihanE = $_POST['pilihanE'];
+            $jawaban = strtolower($_POST['jawaban']);
+            $bahas = $_POST['bahas'] != NULL ? $_POST['bahas'] : '';
+            $sqlUpdateSoal = "UPDATE tb_soal SET judul_soal='$soal', a='$pilihanA',b='$pilihanB',c='$pilihanC',d='$pilihanD',e='$pilihanE', kunci='$jawaban', pembahasan='$bahas' WHERE id_soal='$id'";
+            $exec = mysqli_query($link,$sqlUpdateSoal);
+            if ($exec) {
+              $data['dashboard'] = array(
+                'kode' => '1',
+                'message' => 'Soal berhasil diubah !'
+              );
+            }
+            else {
+              $data['dashboard'] = array(
+                'kode' => '0',
+                'message' => mysqli_error($link)
+              );
+            }
           }
           // hapus soal
           elseif ($route == "dashboard" && $uuid == "hapusSoal" && isset($_GET['idSoal'])) {
-            # code...
+            $id = $_GET['idSoal'];
+            $sqlSoal = mysqli_query($link,"DELETE FROM tb_soal WHERE id_soal='$id'");
+            if ($sqlSoal) {
+              $data['dashboard'] = array(
+                'kode' => '1',
+                'message' => 'Soal berhasil dihapus !'
+              );
+            }
+            else {
+              $data['dashboard'] = array(
+                'kode' => '0',
+                'message' => mysqli_error($link)
+              );
+            }
           }
           // withdraw
           elseif ($route == "dashboard" && $uuid == "withDraw" && isset($_GET['email'])) {
