@@ -1,0 +1,25 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.kukitriplan.smartquizapp",
+    "sha256_cert_fingerprints":
+    ["41:52:1F:94:07:D0:68:37:C7:A9:5D:FA:2B:59:25:1A:95:B3:8C:11:8B:A5:B7:67:C9:B0:3B:DB:6B:55:B0:CB"]
+  }
+},
+{
+  "relation": ["delegate_permission/common.get_login_creds"],
+  "target": {
+    "namespace": "web",
+    "site": "https://www.kukitriplan.com"
+  }
+},
+{
+  "relation": ["delegate_permission/common.get_login_creds"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.kukitriplan.smartquizapp",
+    "sha256_cert_fingerprints":
+    ["41:52:1F:94:07:D0:68:37:C7:A9:5D:FA:2B:59:25:1A:95:B3:8C:11:8B:A5:B7:67:C9:B0:3B:DB:6B:55:B0:CB"]
+  }
+}]

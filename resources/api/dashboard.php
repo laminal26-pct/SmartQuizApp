@@ -248,8 +248,7 @@
                 'kode' => '0',
                 'jumlahSoal' => mysqli_num_rows($exec),
                 'title' => $r['judul'],
-                'message' => 'Data Soal Kosong',
-                'soalList' => array()
+                'message' => 'Data Soal Kosong'
               );
             }
           }

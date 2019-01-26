@@ -1,4 +1,3 @@
-    </div>
     
     <div id="loading" aria-hidden="true" role="dialog"></div>
     <script src="<?= BASE_URL; ?>/assets/plugins/jquery/dist/jquery.min.js"></script>

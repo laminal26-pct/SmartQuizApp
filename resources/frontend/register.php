@@ -1,4 +1,8 @@
 <?php include_once 'master/header.php'; ?>
+      <div class="login-box">
+        <div class="login-logo">
+          <b><?= APPNAME; ?></b>
+        </div>
         <div class="login-box-body">
           <p class="login-box-msg">Please Register</p>
           <div id="message"></div>
@@ -35,4 +39,5 @@
           I forget my password &nbsp;<a href="<?= BASE_URL . '/forget-password'; ?>">Click here !</a><br>
           Have an account ? &nbsp;<a href="<?= BASE_URL . '/'; ?>">Login</a>
         </div>
+      </div>      
 <?php include_once 'master/footer.php'; ?>

@@ -18,6 +18,7 @@ RewriteRule ^forget-password?$ resources/frontend/forget.php
 RewriteRule ^reset-password?$ resources/frontend/reset.php
 RewriteRule ^verification?$ resources/frontend/verify.php
 RewriteRule ^404?$ resources/frontend/404.php
+RewriteRule ^privacy?$ resources/frontend/privacy.php
 
 RewriteRule ^api/v1/([a-z-]+)\/?$ resources/api/auth.php?tipe=$1
 RewriteRule ^api/v1/user/home?$ resources/api/home.php

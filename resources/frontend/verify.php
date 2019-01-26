@@ -1,4 +1,8 @@
 <?php include_once 'master/header.php'; ?>
+<div class="login-box">
+  <div class="login-logo">
+    <b><?= APPNAME; ?></b>
+  </div>
   <div class="login-box-body">
   <?php
     if (isset($_GET['t']) != NULL && isset($_GET['e']) != NULL && isset($_GET['_token']) != NULL) {
@@ -121,4 +125,5 @@
     }
   ?>
   </div>
+</div>
 <?php include_once 'master/footer.php'; ?>
