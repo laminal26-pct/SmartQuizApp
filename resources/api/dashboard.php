@@ -157,7 +157,7 @@
             $sqlProfile .= " WHERE tb_users.email='$email' LIMIT 1";
             $r = mysqli_fetch_assoc(mysqli_query($link,$sqlProfile));
             $id = $r['id_user'];
-            $sqlKuisAuthor = "SELECT tb_kuis.*, tb_rating.*, tb_users.id_user, tb_users.username, tb_kategori.id_kategori, tb_kategori.nama_kategori, tb_mapel.*, tb_soal.* FROM tb_kuis
+            $sqlKuisAuthor = "SELECT tb_kuis.id_kuis as idKuis, tb_kuis.*, tb_rating.*, tb_users.id_user, tb_users.username, tb_kategori.id_kategori, tb_kategori.nama_kategori, tb_mapel.*, tb_soal.* FROM tb_kuis
                               LEFT JOIN (SELECT *, AVG(tb_rating.rating) as rate FROM tb_rating GROUP BY id_kuis) tb_rating ON tb_rating.id_kuis = tb_kuis.id_kuis
                               INNER JOIN tb_users ON tb_users.id_user = tb_kuis.id_user
                               INNER JOIN tb_kategori ON tb_kategori.id_kategori = tb_kuis.id_kategori
@@ -171,6 +171,7 @@
                 $data['dashboard']['kode'] = '1';
                 $data['dashboard']['kuisList'][] = array(
                   'nomor' => $i++.".",
+                  'id_kuis' => $r['idKuis'],
                   'judul' => $r['judul'],
                   'slug' => $r['slug'],
                   'author' => $r['username'],
@@ -196,13 +197,121 @@
               );
             }
           }
-          // detail & edit kuis
-          elseif ($route == "dashboard" && ($uuid == "detailKuis" || $uuid == "editKuis") && isset($_GET['idKuis'])) {
-            # code...
+          // edit kuis
+          elseif ($route == "dashboard" && $uuid == "editKuis" && isset($_GET['idKuis'])) {
+            $id = $_GET['idKuis'];
+            $sqlKuisAuthor = "SELECT tb_kuis.id_kuis as idKuis, tb_kuis.*, tb_rating.*, tb_users.id_user, tb_users.username, tb_kategori.id_kategori, tb_kategori.nama_kategori, tb_mapel.*, tb_soal.* FROM tb_kuis
+                              LEFT JOIN (SELECT *, AVG(tb_rating.rating) as rate FROM tb_rating GROUP BY id_kuis) tb_rating ON tb_rating.id_kuis = tb_kuis.id_kuis
+                              INNER JOIN tb_users ON tb_users.id_user = tb_kuis.id_user
+                              INNER JOIN tb_kategori ON tb_kategori.id_kategori = tb_kuis.id_kategori
+                              INNER JOIN tb_mapel ON tb_mapel.id_mapel = tb_kuis.id_mapel
+                              LEFT JOIN (SELECT id_kuis, COUNT(*) as nomorSoal FROM tb_soal GROUP BY id_kuis) tb_soal ON tb_soal.id_kuis = tb_kuis.id_kuis
+                              WHERE tb_kuis.id_kuis='$id'";
+            $exec = mysqli_query($link,$sqlKuisAuthor);
+            if (mysqli_num_rows($exec) == 1) {
+              $kategori = array();
+              $mapel = array();
+              $sqlKategori = mysqli_query($link,"SELECT * FROM tb_kategori");
+              $sqlMapel = mysqli_query($link,"SELECT * FROM tb_mapel ORDER BY nama_mapel ASC");
+              $kategori[] = array('id' => NULL, 'title' => "Pilih Kategori Kuis");
+              $mapel[] = array('id' => NULL, 'mapel' => "Pilih Mata Pelajaran Kuis");
+              while ($r = mysqli_fetch_assoc($sqlKategori)) {
+                $kategori[] = array(
+                  'id' => $r['id_kategori'],
+                  'title' => $r['nama_kategori']
+                );
+              }
+              while ($r = mysqli_fetch_assoc($sqlMapel)) {
+                $mapel[] = array(
+                  'id' => $r['id_mapel'],
+                  'mapel' => $r['nama_mapel']
+                );
+              }
+              $r = mysqli_fetch_assoc($exec);
+              $data['dashboard'] = array(
+                'kode' => '1',
+                'kategori' => $kategori,
+                'mapel' => $mapel,
+                'kuis' => array(
+                  'id_kuis' => $r['idKuis'],
+                  'judul' => $r['judul'],
+                  'slug' => $r['slug'],
+                  'author' => $r['username'],
+                  'judul' => $r['judul'],
+                  'slug' => $r['slug'],
+                  'soal' => $r['jumlah_soal'],
+                  'durasi' => $r['durasi'],
+                  'harga' => $r['harga'],
+                  'cover' => $url . '/assets/img/kuis/' . $r['cover'],
+                  'deskripsi' => $r['deskripsi'],
+                  'id_kategori' => $r['id_kategori'],
+                  'nm_kategori' => $r['nama_kategori'],
+                  'id_mapel' => $r['id_mapel'],
+                  'nm_mapel' => $r['nama_mapel'],
+                  'status' => $r['status'],
+                  'acak' => $r['soal_acak'],
+                  'bahas' => $r['tmpl_bahas'],
+                  'rating' => $r['rate'] != NULL ? $r['rate'] : 0,
+                  'nomorSoal' => $r['nomorSoal'] == 0 ? 1 : $r['nomorSoal']+1
+                )
+              );
+            }
+            else {
+              $data['dashboard'] = array(
+                'kode' => '0',
+                'message' => mysqli_error($link)
+              );
+            }
+          }
+          // ubah Kuis
+          elseif ($route == "dashboard" && $uuid == "ubahKuis" && isset($_GET['idKuis'])) {
+            $id = $_GET['idKuis'];
+            $idKategori = $_POST['idKategori'];
+            $tmplBahas = $_POST['tmplBahas'];
+            $soal = $_POST['soal'];
+            $harga = $_POST['harga'];
+            $idMapel = $_POST['idMapel'];
+            $deskripsi = $_POST['deskripsi'];
+            $judul = $_POST['judul'];
+            $durasi = $_POST['durasi'];
+            $acakSoal = $_POST['acakSoal'];
+            $slug = hash('sha512', time());
+            $date = date('Y-m-d H:i:s',strtotime('now'));
+            $cover = "";
+            $file = "../../assets/img/kuis/";
+            if ($_POST['cover'] == "default.png") {
+             $cover = "default.png";
+             $fileName = "default.png";
+             $file .= $fileName;
+            } else {
+             $cover = htmlspecialchars($_POST['cover']);
+             $cover = str_replace('data:image/png;base64,', '', $cover);
+             $cover = str_replace(' ','+', $cover);
+             $dataCover = base64_decode($cover);
+             $fileName = uniqid() . '.png';
+             $file .= $fileName;
+             file_put_contents($file,$dataCover);
+            }
+            $query = "UPDATE tb_kuis SET judul='$judul', jumlah_soal='$soal',durasi='$durasi', harga='$harga',
+                      soal_acak='$acakSoal', tmpl_bahas='$tmplBahas', deskripsi='$deskripsi', cover='$fileName'
+                      WHERE id_kuis='$id'";
+            $exec = mysqli_query($link,$query);
+            if ($exec) {
+              $data['dashboard'] = array(
+                'kode' => '1',
+                'message' => 'Kuis berhasil diubah !'
+              );
+            }
+            else {
+              $data['dashboard'] = array(
+                'kode' => '0',
+                'message' => mysqli_error($link)
+              );
+            }
           }
           // hapus kuis
           elseif ($route == "dashboard" && $uuid == "hapusKuis" && isset($_GET['idKuis'])) {
-            $id = $_GET['id'];
+            $id = $_GET['idKuis'];
             $sqlSoal = mysqli_query($link,"DELETE FROM tb_soal WHERE id_kuis='$id'");
             $sqlKuis = mysqli_query($link,"DELETE FROM tb_kuis WHERE id_kuis='$id'");
             if ($sqlSoal && $sqlKuis) {
