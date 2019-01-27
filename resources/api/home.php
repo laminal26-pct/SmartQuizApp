@@ -298,7 +298,7 @@
                 while ($r = mysqli_fetch_assoc($execAdmin)) {
                   $id = $r['id_user'];
                   $price = ($k['harga'] * 0.8) / mysqli_num_rows($execAdmin);
-                  //mysqli_query($link,"UPDATE tb_profile SET saldo=saldo+$price WHERE id_user='$id'");
+                  mysqli_query($link,"UPDATE tb_profile SET saldo=saldo+$price WHERE id_user='$id'");
                 }
                 $soal = array();
                 $idKuis = $k['idKuis'];
@@ -314,10 +314,10 @@
                 }
                 $execSoal = mysqli_query($link,$sqlSoal);
                 $price = $k['harga'] * 0.2;
-                //mysqli_query($link,"UPDATE tb_profile SET saldo=saldo+$price WHERE id_user='$idAuthor'");
+                mysqli_query($link,"UPDATE tb_profile SET saldo=saldo+$price WHERE id_user='$idAuthor'");
                 $idUser = $p['id_user'];
                 $price = $k['harga'];
-                //mysqli_query($link,"UPDATE tb_profile SET saldo=saldo-$price WHERE id_user='$idUser'");
+                mysqli_query($link,"UPDATE tb_profile SET saldo=saldo-$price WHERE id_user='$idUser'");
                 $data['home'] = array(
                   'kode' => '1',
                   'title' => $k['judul'],
@@ -343,7 +343,12 @@
             }
           }
           // tampil soal
-          elseif ($route == "home" && $uuid == "tampilSoal" && isset($_GET['idKuis'])) {
+          elseif ($route == "home" && $uuid == "tampilSoal" && isset($_GET['email']) && isset($_GET['idKuis'])) {
+            $email = $_GET['email'];
+            $sqlProfile .= " WHERE tb_users.email='$email' LIMIT 1";
+            $execProfile = mysqli_query($link,$sqlProfile);
+            $p = mysqli_fetch_assoc($execProfile);
+            $idUser = $p['id_user'];
             $id = $_GET['idKuis'];
             $sqlKuis .= " AND tb_kuis.id_kuis='$id'";
             $execKuis = mysqli_query($link,$sqlKuis);
@@ -353,18 +358,22 @@
             $durasi = $k['durasi'];
             $sqlSoal = "";
             if ($acak == 1) {
-              $sqlSoal .= "SELECT * FROM tb_soal WHERE id_kuis='$idKuis' ORDER BY RAND() LIMIT 0,$jmlh";
+              $sqlSoal .= "SELECT * FROM tb_soal WHERE id_kuis='$id' ORDER BY RAND() LIMIT 0,$jmlh";
             }
             else {
-              $sqlSoal .= "SELECT * FROM tb_soal WHERE id_kuis='$idKuis' LIMIT 0,$jmlh";
+              $sqlSoal .= "SELECT * FROM tb_soal WHERE id_kuis='$id' LIMIT 0,$jmlh";
             }
             $execSoal = mysqli_query($link,$sqlSoal);
             if (mysqli_num_rows($execSoal) > 0) {
               $soal = array();
+              $i = 1;
               while ($s = mysqli_fetch_assoc($execSoal)) {
+                $idSoal = $s['id_soal'];
+                mysqli_query($link,"INSERT INTO tb_result VALUES(NULL,'$idUser','$id','$idSoal',NULL,'0')");
                 $soal[] = array(
+                  'idKuis' => $s['id_kuis'],
                   'idSoal' => $s['id_soal'],
-                  'judulSoal' => $s['judul_soal'],
+                  'judulSoal' => $i++ . ". " . $s['judul_soal'],
                   'A' => $s['a'],
                   'B' => $s['b'],
                   'C' => $s['c'],
@@ -372,22 +381,113 @@
                   'E' => $s['e'],
                 );
               }
-              $data['dashboard'] = array(
+              $data['home'] = array(
                 'kode' => '1',
+                'kuis' => array('id_kuis' => $id),
                 'durasi' => $durasi * 60 * 1000,
                 'soal' => $soal
               );
             }
             else {
-              $data['dashboard'] = array(
+              $data['home'] = array(
                 'kode' => '0',
                 'message' => mysqli_error($link)
               );
             }
           }
-          // submit jawaban belum
-          elseif ($route == "home" && $uuid == "submitJawaban" && isset($_GET['email']) && isset($_GET['idKuis'])) {
-            // code...
+          // submit jawaban
+          elseif ($route == "home" && $uuid == "submitJawaban" && isset($_GET['email'])) {
+            $email = $_GET['email'];
+            $sqlProfile .= " WHERE tb_users.email='$email' LIMIT 1";
+            $execProfile = mysqli_query($link,$sqlProfile);
+            $p = mysqli_fetch_assoc($execProfile);
+            $idUser = $p['id_user'];
+            $idKuis = $_POST['idKuis'];
+            $idSoal = $_POST['idSoal'];
+            $pilihan = strtolower($_POST['pilihan']);
+            $ket = "0";
+            $checkJawaban = mysqli_query($link,"SELECT * FROM tb_soal WHERE id_soal='$idSoal' LIMIT 1");
+            $cj = mysqli_fetch_assoc($checkJawaban);
+            if ($pilihan == $cj['kunci']) {
+              $ket = "1";
+            } else {
+              $ket = "0";
+            }
+            $checkResult = mysqli_query($link,"SELECT * FROM tb_result WHERE id_user='$idUser' AND id_kuis='$idKuis' AND id_soal='$idSoal'");
+            if (mysqli_num_rows($checkResult) == 1) {
+              $updateJawaban = mysqli_query($link,"UPDATE tb_result SET pilihan='$pilihan', ket='$ket' WHERE id_soal='$idSoal'");
+              if ($updateJawaban) {
+                $data['home'] = array(
+                  'kode' => '1'
+                );
+              }
+              else {
+                $data['home'] = array(
+                  'kode' => '0',
+                  'message' => mysqli_error($link)
+                );
+              }
+            }
+          }
+          // selesai kuis
+          elseif ($route == "home" && $uuid == "selesaiKuis" && isset($_GET['email']) && isset($_GET['idKuis'])) {
+            $email = $_GET['email'];
+            $sqlProfile .= " WHERE tb_users.email='$email' LIMIT 1";
+            $execProfile = mysqli_query($link,$sqlProfile);
+            $p = mysqli_fetch_assoc($execProfile);
+            $idUser = $p['id_user'];
+            $idKuis = $_GET['idKuis'];
+            $sqlResultBenar = "SELECT COUNT(ket) as BENAR FROM tb_result WHERE id_user='$idUser' AND id_kuis='$idKuis' AND ket='1'";
+            $benar = mysqli_query($link,$sqlResultBenar);
+            $resultB = mysqli_fetch_assoc($benar);
+            $b = $resultB['BENAR'];
+            $sqlResultSalah = "SELECT COUNT(ket) as SALAH FROM tb_result WHERE id_user='$idUser' AND id_kuis='$idKuis' AND ket='0'";
+            $salah = mysqli_query($link,$sqlResultSalah);
+            $resultS = mysqli_fetch_assoc($salah);
+            $s = $resultS['SALAH'];
+            if ($benar && $salah) {
+              $nilai = ($b * 100) / ($b + $s);
+              $n = doubleval($nilai);
+              $date = date('Y-m-d H:i:s', strtotime('now'));
+              $sqlNilai = mysqli_query($link,"INSERT INTO tb_nilai VALUES(NULL,'$idUser','$idKuis','$b','$s','$n','$date')");
+              if ($sqlNilai) {
+                mysqli_query($link,"DELETE FROM tb_result WHERE id_user='$idUser' AND id_kuis='$idKuis'");
+                $data['home'] = array(
+                  'kode' => '1',
+                  'kuis' => array('id_kuis' => $idKuis),
+                  'nilai' => doubleval($nilai)
+                );
+              }
+              else {
+                $data['home'] = array(
+                  'kode' => '0',
+                  'message' => mysqli_error($link)
+                );
+              }
+            }
+          }
+          // beri bintang
+          elseif ($route == "home" && $uuid == "beriBintang" && isset($_GET['email']) && isset($_GET['idKuis'])) {
+            $email = $_GET['email'];
+            $sqlProfile .= " WHERE tb_users.email='$email' LIMIT 1";
+            $execProfile = mysqli_query($link,$sqlProfile);
+            $p = mysqli_fetch_assoc($execProfile);
+            $idUser = $p['id_user'];
+            $idKuis = $_GET['idKuis'];
+            $rating = $_POST['rating'];
+            $exec = mysqli_query($link,"INSERT INTO tb_rating VALUES(NULL,'$idKuis','$idUser','$rating')");
+            if ($exec) {
+              $data['home'] = array(
+                'kode' => '1',
+                'message' => 'Terima kasih atas rating yang anda berikan !'
+              );
+            }
+            else {
+              $data['home'] = array(
+                'kode' => '0',
+                'message' => mysqli_error($link)
+              );
+            }
           }
           // Top Up Saldo
           elseif ($route == "home" && $uuid == "topUp" && isset($_GET['email'])) {
@@ -686,9 +786,8 @@
                   'durasi' => $r['durasi'],
                   'benar' => $r['jumlah_benar'],
                   'salah' => $r['jumlah_salah'],
-                  'waktu' => $r['sisa_waktu'],
                   'tanggal' => date('d-m-Y, H:i:s',strtotime($r['created_at'])),
-                  'rating' => $r['rating']
+                  'rating' => $r['rating'] != NULL ? $r['rating'] : 0
                 );
               }
             }
