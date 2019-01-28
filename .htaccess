@@ -20,19 +20,20 @@ RewriteRule ^verification?$ resources/frontend/verify.php
 RewriteRule ^404?$ resources/frontend/404.php
 RewriteRule ^privacy?$ resources/frontend/privacy.php
 
+RewriteRule ^dashboard\/([a-z0-9-@_]+)?$ resources/backend/dashboard.php?menu=$1
+RewriteRule ^modal?$ resources/backend/modal.php
+RewriteRule ^fetch?$ resources/backend/fetch.php
+
+RewriteRule ^logout?$ resources/backend/logout.php
+
 RewriteRule ^api/v1/([a-z-]+)\/?$ resources/api/auth.php?tipe=$1
 RewriteRule ^api/v1/user/home?$ resources/api/home.php
 RewriteRule ^api/v1/user/dashboard?$ resources/api/dashboard.php
 RewriteRule ^api/v1/user/generate?$ resources/api/generate.php
 
 #RewriteRule ^account\/([A-Za-z0-9=-_]+)\/([A-Za-z0-9=-_]+)\/([A-Za-z0-9]+)\/?$ resources/frontend/verify.php?tipe=$1&e=$2&_token=$3
-
 #RewriteRule ^account/reset-password?$ mods_json/reset-password.php
-#RewriteRule ^logout?$ pages/logout.php
-#RewriteRule ^dashboard/?$ pages/backend/dashboard.php
-
 #RewriteRule ^generate?$ mods_json/generate_kuis.php
-
 #RewriteRule ^api/v1/login/?$ mods_json/login.php
 #RewriteRule ^api/v1/register/?$ mods_json/register.php
 #RewriteRule ^api/v1/forget-password/?$ mods_json/forget-password.php

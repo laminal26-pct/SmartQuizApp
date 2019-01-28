@@ -21,7 +21,7 @@
               INNER JOIN tb_kategori ON tb_kategori.id_kategori = tb_kuis.id_kategori
               INNER JOIN tb_mapel ON tb_mapel.id_mapel = tb_kuis.id_mapel
               WHERE tb_kuis.status='1'";
-  $sqlProfile = "SELECT tb_level.*, tb_users.id_user, tb_users.id_level, tb_users.username, tb_users.email,
+  $sqlProfile = "SELECT tb_level.*, tb_users.id_user, tb_users.id_level, tb_users.username, tb_users.email, tb_users.password,
                  tb_profile.id_profil, tb_profile.id_user, tb_profile.nama, tb_profile.tgl_lahir, tb_profile.jk, tb_profile.no_hp,
                  tb_profile.almt, tb_profile.saldo, tb_profile.poin, tb_profile.nama_bank, tb_profile.no_rek, tb_profile.atas_nama
                  FROM tb_users
@@ -754,9 +754,46 @@
             }
 
           }
-          // Update password belom
+          // Update password
           elseif ($route == "home" && $uuid == "ubahPassword" && isset($_GET['email'])) {
-            // code...
+            $email = $_GET['email'];
+            $sqlProfile .= " WHERE tb_users.email='$email' LIMIT 1";
+            $execProfile = mysqli_query($link,$sqlProfile);
+            $p = mysqli_fetch_assoc($execProfile);
+            $idUser = $p['id_user'];
+
+            $passold = $_POST['passold'];
+            $passnew = $_POST['passnew'];
+            if ($passold == NULL || $passnew == NULL) {
+              $data['home'] = array(
+                'kode' => '1',
+                'message' => 'Kata sandi tidak boleh kosong !'
+              );
+            }
+            else {
+              if (hash('sha512', $passold) == $p['password']) {
+                $pass = hash('sha512', $passnew);
+                $updatePass = mysqli_query($link,"UPDATE tb_users SET password='$pass' WHERE id_user='$idUser'");
+                if ($updatePass) {
+                  $data['home'] = array(
+                    'kode' => '1',
+                    'message' => 'Kata sandi berhasil diperbarui !'
+                  );
+                }
+                else {
+                  $data['home'] = array(
+                    'kode' => '0',
+                    'message' => mysqli_query($link)
+                  );
+                }
+              }
+              else {
+                $data['home'] = array(
+                  'kode' => '0',
+                  'message' => 'Kata sandi lama tidak sesuai dengan database'
+                );
+              }
+            }
           }
           // history ikut kuis
           elseif ($route == "home" && $uuid == "historyKuis" && isset($_GET['email'])) {

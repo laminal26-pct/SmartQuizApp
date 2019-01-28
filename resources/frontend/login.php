@@ -8,6 +8,7 @@
         <div id="message"></div>
         <form method="POST" id="login">
           <div class="form-group has-feedback">
+            <input type="hidden" name="firebase_token" value="">
             <input type="email" name="email" class="form-control" placeholder="Email" required>
             <span class="fa fa-user form-control-feedback"></span>
             <p id="username"></p>
@@ -26,5 +27,5 @@
         I forget my password &nbsp;<a href="<?= BASE_URL . '/forget-password'; ?>">Click here !</a><br>
         Haven't an account ? &nbsp;<a href="<?= BASE_URL . '/register'; ?>">Register</a>
       </div>
-    </div> 
+    </div>
 <?php include_once 'master/footer.php'; ?>

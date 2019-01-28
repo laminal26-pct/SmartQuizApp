@@ -48,9 +48,10 @@
   }
   else {
     if ($mods == "login") {
-      if (isset($_POST['email']) && isset($_POST['password']) && !empty($_POST['email']) && !empty($_POST['password'])) {
+      if (isset($_POST['email']) && isset($_POST['password']) && !empty($_POST['email']) && !empty($_POST['password']) && isset($_POST['firebase_token'])) {
         $a = mysqli_real_escape_string($link,strip_tags($_POST['email']));
         $b = mysqli_real_escape_string($link,strip_tags($_POST['password']));
+        $tokenFirebase = $_POST['firebase_token'];
         if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
           $check = mysqli_query($link,"SELECT email FROM tb_users WHERE email='$a'");
           if (mysqli_num_rows($check) == 0) {
@@ -81,7 +82,7 @@
               $exp = date('Y-m-d H:i:s',strtotime('+7 day'));
               $loginDate = date('Y-m-d H:i:s',strtotime('now'));
               $updateLogin = mysqli_query($link,"UPDATE tb_users SET first_login='$loginDate', ip_addr='$ipaddress' WHERE id_user='$id' LIMIT 1");
-              $updateToken = mysqli_query($link,"UPDATE tb_token SET access_token='$token', forget_token=NULL, expried_in='$exp', updated_at='$loginDate' WHERE id_user='$id' LIMIT 1");
+              $updateToken = mysqli_query($link,"UPDATE tb_token SET firebase_token='$tokenFirebase', access_token='$token', forget_token=NULL, expried_in='$exp', updated_at='$loginDate' WHERE id_user='$id' LIMIT 1");
               $idUser = $r['id_user'];
               $lengkap = '1';
               $sqlUser = mysqli_fetch_assoc(mysqli_query($link,"SELECT * FROM tb_profile WHERE id_user='$idUser'"));
@@ -128,10 +129,10 @@
                   'notif' => array('setNotif' => false),
                 );
               }
-              //$_SESSION['is_logged'] = true;
-              //$_SESSION['username'] = $r['name'];
-              //$_SESSION['email'] = $r['email'];
-              //$_SESSION['level'] = $r['nama_level'];
+              $_SESSION['is_logged'] = true;
+              $_SESSION['username'] = $r['name'];
+              $_SESSION['email'] = $r['email'];
+              $_SESSION['level'] = $r['nama_level'];
             }
             else {
               $data['auth'] = array(
