@@ -187,7 +187,7 @@
           // kategori
           elseif ($route == "home" && $uuid == "kategori" && isset($_GET['id'])) {
             $id = $_GET['id'];
-            $sqlKuis .= " AND rate > 3 AND tb_kuis.id_kategori='$id' ORDER BY RAND()";
+            $sqlKuis .= " AND tb_kuis.id_kategori='$id' ORDER BY RAND()";
             $kategori = mysqli_query($link,$sqlKuis);
             if (mysqli_num_rows($kategori) > 0) {
               $data['home'] = array(

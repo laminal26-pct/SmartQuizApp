@@ -433,9 +433,85 @@
           }
           // withdraw
           elseif ($route == "dashboard" && $uuid == "withDraw" && isset($_GET['email'])) {
-            # code...
+            $email = $_GET['email'];
+            $sqlProfile .= " WHERE tb_users.email='$email' LIMIT 1";
+            $r = mysqli_fetch_assoc(mysqli_query($link,$sqlProfile));
+            $id = $r['id_user'];
+            $jmlh = $_POST['jumlah'];
+            $date = date('Y-m-d H:i:s',strtotime('now'));
+            if ($r['saldo'] > $jmlh) {
+              if ($jmlh >= 100000) {
+                $exec = mysqli_query($link,"INSERT INTO tb_withdraw VALUES(NULL,'$id','$jmlh','0','$date')");
+                if ($exec) {
+                  $data['dashboard'] = array(
+                    'kode' => '0',
+                    'message' => 'Penarikan sejumlah Rp. '.$jmlh.' akan kami proses !'
+                  );
+                }
+                else {
+                  $data['dashboard'] = array(
+                    'kode' => '0',
+                    'message' => mysqli_error($link)
+                  );
+                }
+              }
+              else {
+                $data['dashboard'] = array(
+                  'kode' => '0',
+                  'message' => 'Maaf, min penarikan adalah 100.000'
+                );
+              }
+            }
+            else {
+              $data['dashboard'] = array(
+                'kode' => '0',
+                'message' => 'Maaf, saldo anda tidak cukup untuk penarikan'
+              );
+            }
           }
+          // history with draw
+          elseif ($route == "dashboard" && $uuid == "historyWithDraw" && isset($_GET['email'])) {
+            $email = $_GET['email'];
+            $sqlProfile .= " WHERE tb_users.email='$email' LIMIT 1";
+            $r = mysqli_fetch_assoc(mysqli_query($link,$sqlProfile));
+            $id = $r['id_user'];
+            $historyWD = mysqli_query($link,"SELECT * FROM tb_withdraw WHERE id_user='$id' ORDER BY created_at DESC");
+            if (mysqli_num_rows($historyWD) > 0) {
+              $history = array();
+              $i = 1;
+              while ($a = mysqli_fetch_assoc($historyWD)) {
+                $history[] = array(
+                  'nomor' => $i++.".",
+                  'title' => "Penarikan Dana sebesar " . number_format($a['jumlah']),
+                  'status' => $a['status'] == 1 ? 'Telah ditransfer' : 'Dalam proses',
+                  'tanggal' => date('d-m-Y', strtotime($a['created_at'])),
+                  'namaBank' => $r['nama_bank'] != NULL ? $r['nama_bank'] : 'Silahkan lengkapi profil anda',
+                  'rekening' => $r['no_rek'] != NULL ? $r['no_rek'] : 'Silahkan lengkapi profil anda',
+                  'atasNama' => $r['atas_nama'] != NULL ? $r['atas_nama'] : 'Silahkan lengkapi profil anda'
+                );
+              }
+              $data['dashboard'] = array(
+                'kode' => '1',
+                'saldo' => $r['saldo'],
+                'historyList' => $history
+              );
+            }
+            else {
+              $data['dashboard'] = array(
+                'kode' => '0',
+                'saldo' => $r['saldo'],
+                'message' => 'Belum pernah with draw'
+              );
+            }
+          }
+          // history ikut kuis
+          elseif ($route == "dashboard" && $uuid == "historyIkutKuis" && isset($_GET['email'])) {
+            $email = $_GET['email'];
+            $sqlProfile .= " WHERE tb_users.email='$email' LIMIT 1";
+            $r = mysqli_fetch_assoc(mysqli_query($link,$sqlProfile));
+            $id = $r['id_user'];
 
+          }
         }
       }
       else {
