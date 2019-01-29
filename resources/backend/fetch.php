@@ -26,7 +26,76 @@ if (isset($_SESSION['is_logged'])) {
     }
     // data kuis
     elseif ($route == $dataRoute[0] && $uuid == "tabelKuis") {
-      // code...
+      $columns = array(
+        '0' => 'tb_kuis.id_kuis',
+        '1' => 'tb_kuis.judul',
+        '2' => 'tb_users.username',
+        '3' => 'tb_kuis.jumlah_soal',
+        '4' => 'tb_kuis.durasi',
+        '5' => 'tb_kuis.status'
+      );
+      // getting total number records without any search
+      $sql = "SELECT tb_kuis.*, tb_users.* FROM tb_kuis INNER JOIN tb_users ON tb_users.id_user = tb_kuis.id_user";
+      $query=mysqli_query($link, $sql) or die("error");
+      $totalData = mysqli_num_rows($query);
+      $totalFiltered = $totalData;
+      if( !empty($requestData['search']['value']) ) {
+        // if there is a search parameter
+        $sql = "SELECT tb_kuis.*, tb_users.* FROM tb_kuis INNER JOIN tb_users ON tb_users.id_user = tb_kuis.id_user";
+        $sql.=" WHERE tb_kuis.judul LIKE '%".$requestData['search']['value']."%' ";
+        $sql.=" OR tb_users.username LIKE '%".$requestData['search']['value']."%' ";
+        $sql.=" OR tb_kuis.jumlah_soal LIKE '%".$requestData['search']['value']."%' ";
+        $sql.=" OR tb_kuis.status LIKE '%".$requestData['search']['value']."%' ";
+        $query=mysqli_query($link, $sql) or die("error");
+        $totalFiltered = mysqli_num_rows($query);
+
+        $sql.=" ORDER BY ". $columns[$requestData['order'][0]['column']]."   ".$requestData['order'][0]['dir']."   LIMIT ".$requestData['start']." ,".$requestData['length']."   ";
+        $query=mysqli_query($link, $sql) or die("error"); // again run query with limit
+
+      }
+      else {
+
+        $sql = "SELECT tb_kuis.*, tb_users.* FROM tb_kuis INNER JOIN tb_users ON tb_users.id_user = tb_kuis.id_user";
+        $sql.=" ORDER BY ". $columns[$requestData['order'][0]['column']]."   ".$requestData['order'][0]['dir']."   LIMIT ".$requestData['start']." ,".$requestData['length']."   ";
+        $query=mysqli_query($link, $sql) or die("employee-grid-data.php: get employees");
+
+      }
+      $i = 1;
+      $data = array();
+      while( $row=mysqli_fetch_array($query) ) {
+        $detail = base64_encode('detailKuis');
+        $edit = base64_encode('editKuis');
+        $delete = base64_encode('hapusKuis');
+        $nestedData=array();
+        $nestedData[] = $i++.".";
+        $nestedData[] = $row["judul"];
+        $nestedData[] = $row["username"];
+        $nestedData[] = $row["jumlah_soal"];
+        $nestedData[] = $row["durasi"];
+        $nestedData[] = $row["status"] == "1" ? '<label class="label label-success">Aktif</label>' : '<label class="label label-warning">Tidak Aktif</label>';
+        $nestedData[] =
+          '<a id="edit" name="edit" class="btn btn-xs btn-warning" title="Edit Data" data-user="'.$row['id_user'].'" data-target="'.$edit.'">
+            <i class="fa fa-edit"></i>
+            <span>Edit</span>
+          </a>'."&nbsp".
+          '<a id="detail" name="detail" class="btn btn-xs btn-info" title="Detail Data" data-user="'.$row['id_user'].'" data-target="'.$detail.'">
+            <i class="fa fa-list"></i>
+            <span>Detail</span>
+          </a>'."&nbsp".
+          '<a id="hapus" name="hapus" class="btn btn-xs btn-danger" title="Hapus Data" title-user="'.$row['name'].'" data-user="'.$row['id_user'].'" data-target="'.$delete.'">
+            <i class="fa fa-trash"></i>
+            <span>Hapus</span>
+          </a>';
+        $data[] = $nestedData;
+      }
+
+      $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval( $totalData ),
+            "recordsFiltered" => intval( $totalFiltered ),
+            "data"            => $data
+            );
+      echo json_encode($json_data);
     }
     // data soal
     elseif ($route == $dataRoute[1] && $uuid == "tabelSoal") {
@@ -38,7 +107,55 @@ if (isset($_SESSION['is_logged'])) {
     }
     // data voucher
     elseif ($route == $dataRoute[3] && $uuid == "tabelVoucher") {
-      // code...
+      $columns = array(
+        '0' => 'id_voucher',
+        '1' => 'kode_voucher',
+        '2' => 'jumlah',
+        '3' => 'tb_users.status'
+      );
+      // getting total number records without any search
+      $sql = "SELECT * FROM tb_voucher";
+      $query=mysqli_query($link, $sql) or die("error");
+      $totalData = mysqli_num_rows($query);
+      $totalFiltered = $totalData;
+      if( !empty($requestData['search']['value']) ) {
+        // if there is a search parameter
+        $sql = "SELECT * FROM tb_users";
+        $sql.=" WHERE kode_voucher LIKE '%".$requestData['search']['value']."%' ";
+        $sql.=" OR jumlah LIKE '%".$requestData['search']['value']."%' ";
+        $query=mysqli_query($link, $sql) or die("error");
+        $totalFiltered = mysqli_num_rows($query);
+
+        $sql.=" ORDER BY ". $columns[$requestData['order'][0]['column']]."   ".$requestData['order'][0]['dir']."   LIMIT ".$requestData['start']." ,".$requestData['length']."   ";
+        $query=mysqli_query($link, $sql) or die("error"); // again run query with limit
+
+      }
+      else {
+
+        $sql = "SELECT * FROM tb_voucher";
+        $sql.=" ORDER BY ". $columns[$requestData['order'][0]['column']]."   ".$requestData['order'][0]['dir']."   LIMIT ".$requestData['start']." ,".$requestData['length']."   ";
+        $query=mysqli_query($link, $sql) or die("employee-grid-data.php: get employees");
+
+      }
+      $i = 1;
+      $data = array();
+      while( $row=mysqli_fetch_array($query) ) {
+
+        $nestedData=array();
+        $nestedData[] = $i++.".";
+        $nestedData[] = $row["kode_voucher"];
+        $nestedData[] = $row["jumlah"];
+        $nestedData[] = $row["status"] == "1" ? '<label class="label label-success">Aktif</label>' : '<label class="label label-warning">Tidak Aktif</label>';
+        $data[] = $nestedData;
+      }
+
+      $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval( $totalData ),
+            "recordsFiltered" => intval( $totalFiltered ),
+            "data"            => $data
+            );
+      echo json_encode($json_data);
     }
     // data user
     elseif ($route == $dataRoute[4] && $uuid == "tabelUser") {

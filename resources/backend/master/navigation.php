@@ -23,25 +23,25 @@
                 <span>Dashboard</span>
               </a>
             </li>
-            <li class="<?= (SECOND_PART == "dashboard" && THIRD_PART == 'admin' && FOURTH_PART == 'berita') ? 'active' : ''; ?>">
+            <li class="<?= (SECOND_PART == "dashboard" && THIRD_PART == 'kuis' && FOURTH_PART == '') ? 'active' : ''; ?>">
               <a href="<?= BASE_URL.'/dashboard/kuis'; ?>" class="menu">
                 <i class="fa fa-newspaper-o"></i>
                 <span>Kuis</span>
               </a>
             </li>
-            <li class="<?= (SECOND_PART == "dashboard" && THIRD_PART == 'admin' && FOURTH_PART == 'galeri') ? 'active' : ''; ?>">
+            <li class="<?= (SECOND_PART == "dashboard" && THIRD_PART == 'with-draw' && FOURTH_PART == '') ? 'active' : ''; ?>">
               <a href="<?= BASE_URL.'/dashboard/with-draw'; ?>" class="menu">
                 <i class="fa fa-bank"></i>
                 <span>Request Withdraw</span>
               </a>
             </li>
-            <li class="<?= (SECOND_PART == "dashboard" && THIRD_PART == 'admin' && FOURTH_PART == 'content') ? 'active' : ''; ?>">
+            <li class="<?= (SECOND_PART == "dashboard" && THIRD_PART == 'voucher' && FOURTH_PART == '') ? 'active' : ''; ?>">
               <a href="<?= BASE_URL.'/dashboard/voucher'; ?>" class="menu">
                 <i class="fa fa-feed"></i>
                 <span>Voucher</span>
               </a>
             </li>
-            <li class="<?= (SECOND_PART == "dashboard" && THIRD_PART == 'admin' && FOURTH_PART == 'user') ? 'active' : ''; ?>">
+            <li class="<?= (SECOND_PART == "dashboard" && THIRD_PART == 'user' && FOURTH_PART == '') ? 'active' : ''; ?>">
               <a href="<?= BASE_URL.'/dashboard/user'; ?>" class="menu">
                 <i class="fa fa-users"></i>
                 <span>User</span>

@@ -210,7 +210,7 @@
                 $sqlUsers = mysqli_query($link,"INSERT INTO tb_users VALUES(NULL,'$a','$b','$getUser[0]','$c','$pass','1','$ipaddress',NULL,NULL,'$date','$date')");
                 $result = mysqli_fetch_assoc(mysqli_query($link,"SELECT id_user,email FROM tb_users WHERE email='$c' LIMIT 1"));
                 $idUser = $result['id_user'];
-                $generateToken = mysqli_query($link,"INSERT INTO tb_token VALUES(NULL,'$idUser',NULL,'$token',NULL,'$exp','$date','$date')");
+                $generateToken = mysqli_query($link,"INSERT INTO tb_token VALUES(NULL,'$idUser',NULL,NULL,'$token',NULL,'$exp','$date','$date')");
                 if ($sqlUsers && $generateToken) {
                   $data['auth'] = array(
                     'kode' => '1',
@@ -387,7 +387,7 @@
       $r = mysqli_fetch_assoc(mysqli_query($link,"SELECT id_user,access_token FROM tb_token WHERE access_token='$token'"));
       $id = $r['id_user'];
       mysqli_query($link,"UPDATE tb_users SET last_login='$date' WHERE id_user='$id'");
-      $sql = mysqli_query($link,"UPDATE tb_token SET updated_at='$date', access_token=NULL, expried_in=NULL WHERE access_token='$token'");
+      $sql = mysqli_query($link,"UPDATE tb_token SET updated_at='$date', firebase_token=NULL, access_token=NULL, expried_in=NULL WHERE access_token='$token'");
       $data['auth'] = array(
         'kode' => '1',
         'message' => 'Logout',

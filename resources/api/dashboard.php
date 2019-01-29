@@ -507,10 +507,44 @@
           // history ikut kuis
           elseif ($route == "dashboard" && $uuid == "historyIkutKuis" && isset($_GET['email'])) {
             $email = $_GET['email'];
-            $sqlProfile .= " WHERE tb_users.email='$email' LIMIT 1";
-            $r = mysqli_fetch_assoc(mysqli_query($link,$sqlProfile));
-            $id = $r['id_user'];
-
+            $sqlHistoryIkut = "SELECT tb_users.id_user, tb_users.username, tb_users.email, tb_kuis.id_kuis, tb_kuis.judul,
+                               tb_nilai.id_user as idPemain, tb_nilai.id_kuis, tb_nilai.jumlah_benar, tb_nilai.jumlah_salah,
+                               tb_nilai.nilai, tb_nilai.created_at, tb_profile.id_user, tb_profile.nama as PEMAIN FROM tb_nilai
+                               LEFT JOIN tb_kuis ON tb_kuis.id_kuis = tb_nilai.id_kuis
+                               LEFT JOIN tb_users ON tb_users.id_user = tb_kuis.id_user
+                               LEFT JOIN (SELECT * FROM tb_profile GROUP BY id_user) tb_profile ON tb_nilai.id_user = tb_profile.id_user
+                               WHERE tb_users.email='$email'";
+            $exec = mysqli_query($link, $sqlHistoryIkut);
+            if (mysqli_num_rows($exec) > 0) {
+              $h = array();
+              $i = 1;
+              while ($a = mysqli_fetch_assoc($exec)) {
+                $idKuis = $a['id_kuis'];
+                $idUser = $a['idPemain'];
+                $sqlRating = mysqli_fetch_assoc(mysqli_query($link,"SELECT id_user, id_kuis, rating FROM tb_rating WHERE id_kuis='$idKuis' AND id_user='$idUser'"));
+                $h[] = array(
+                  'nomor' => $i++.". ",
+                  'author' => $a['username'],
+                  'judul' => $a['judul'],
+                  'benar' => $a['jumlah_benar'],
+                  'salah' => $a['jumlah_salah'],
+                  'nilai' => $a['nilai'],
+                  'tanggal' => date('d-m-Y, H:i:s', strtotime($a['created_at'])),
+                  'pemain' => $a['PEMAIN'],
+                  'rating' => $sqlRating['rating'],
+                );
+              }
+              $data['dashboard'] = array(
+                'kode' => '1',
+                'ikutKuis' => $h
+              );
+            }
+            else {
+              $data['dashboard'] = array(
+                'kode' => '0',
+                'message' => 'belum ada yang main kuis kamu.'
+              );
+            }
           }
         }
       }

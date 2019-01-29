@@ -53,7 +53,7 @@ $(document).ready(function () {
       success: function(response) {
         if (response.auth.kode == "1") {
           $('input[type=submit]').attr('disabled','disabled');
-          setTimeout('window.location.href = "dashboard/"; ',2000);
+          setTimeout('window.location.href = "dashboard\/"; ',2000);
         } else {
           $('#message').fadeIn(500, function() {
             $('input[type=submit]').attr('disabled','disabled');
