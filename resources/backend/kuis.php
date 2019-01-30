@@ -14,7 +14,7 @@
       <div class="box-body">
         <div class="col-md-12 col-xs-12">
           <div class="table-responsive">
-            <table id="tabeluser" class="table table-striped table-bordered" data-remote="<?= base64_encode(sha1('dataKuis')); ?>" data-target="<?= base64_encode('tabelKuis'); ?>">
+            <table id="tabelKuis" class="table table-striped table-bordered" data-remote="<?= base64_encode(sha1('dataKuis')); ?>" data-target="<?= base64_encode('tabelKuis'); ?>">
               <thead>
                 <tr>
                   <th>No</th>
@@ -34,35 +34,35 @@
 </section>
 <!-- /.content -->
 <style>
-  #tabeluser thead tr th:nth-child(1) {
+  #tabelKuis thead tr th:nth-child(1) {
     width: 3% !important;
   }
-  #tabeluser thead tr th:nth-child(4) {
+  #tabelKuis thead tr th:nth-child(4) {
     width: 10% !important;
     text-align: center;
   }
-  #tabeluser tbody tr td:nth-child(4) {
+  #tabelKuis tbody tr td:nth-child(4) {
     text-align: center;
   }
-  #tabeluser thead tr th:nth-child(5) {
+  #tabelKuis thead tr th:nth-child(5) {
     width: 10% !important;
     text-align: center;
   }
-  #tabeluser tbody tr td:nth-child(5) {
+  #tabelKuis tbody tr td:nth-child(5) {
     text-align: center;
   }
-  #tabeluser thead tr th:nth-child(6) {
+  #tabelKuis thead tr th:nth-child(6) {
     width: 10% !important;
     text-align: center;
   }
-  #tabeluser tbody tr td:nth-child(6) {
+  #tabelKuis tbody tr td:nth-child(6) {
     text-align: center;
   }
-  #tabeluser thead tr th:nth-child(7) {
+  #tabelKuis thead tr th:nth-child(7) {
     width: 24% !important;
     text-align: center;
   }
-  #tabeluser tbody tr td:nth-child(7) {
+  #tabelKuis tbody tr td:nth-child(7) {
     text-align: center;
   }
   #modalDetailTabel tbody tr td:nth-child(1){
@@ -87,21 +87,21 @@
       }
     });
 
-    var page = $('#tabeluser').attr('data-remote');
-    var uuid = $('#tabeluser').attr('data-target');
-    var dataTableUser = $('#tabeluser').DataTable({
+    var page = $('#tabelKuis').attr('data-remote');
+    var uuid = $('#tabelKuis').attr('data-target');
+    var dataTableKuis = $('#tabelKuis').DataTable({
       'processing': true,
       'serverSide': true,
       'ajax': {
         url: http+'/fetch?f='+page+"&d="+uuid,
         type: 'POST',
         beforeSend: function() {
-          $("#tabeluser_processing").html('<i class="fa fa-spinner fa-pulse fa-fw text-blue"></i>&nbsp;Memuat Data...');
+          $("#tabelKuis_processing").html('<i class="fa fa-spinner fa-pulse fa-fw text-blue"></i>&nbsp;Memuat Data...');
         },
         error: function(){
-          $(".tabeluser-error").html("");
-          $("#tabeluser").append('<tbody class="tabeluser-error"><tr><td colspan="7">No data found in the server</td></tr></tbody>');
-          $("#tabeluser_processing").css("display","none");
+          $(".tabelKuis-error").html("");
+          $("#tabelKuis").append('<tbody class="tabelKuis-error"><tr><td colspan="7">No data found in the server</td></tr></tbody>');
+          $("#tabelKuis_processing").css("display","none");
         }
       },
       'pageLength': 100,
@@ -116,6 +116,47 @@
       $('#addModal').modal({
         'show': true,
         'backdrop': 'static'
+      });
+    });
+    $(document).on('click','#aktivasi', function(e) {
+      e.preventDefault();
+      var remote = $('#tabelKuis').attr('data-remote');
+      var target = $(this).attr('data-dest');
+      var id = $(this).attr('data-kuis');
+      var form = $(this).attr('data-status');
+      $.ajax({
+        url: http + '/fetch?f='+remote+'&d='+target+'&idKuis='+id+'&s='+form,
+        async: false,
+        dataType: 'json',
+        type: 'GET',
+        processData: false,
+        contentType: false,
+        beforeSend: function() {
+          $('div#loading').show().html('<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>');
+        },
+        success: function(res) {
+          if (res.kuis.kode == 1) {
+            $('div#loading').hide();
+            dataTableKuis.ajax.reload();
+            swal({
+              title: 'Sukses',
+              text: res.kuis.message,
+              type: 'success',
+              allowOutsideClick: false,
+              showConfirmButton: true,
+            });
+          } else {
+            $('div#loading').hide();
+            dataTableKuis.ajax.reload();
+            swal({
+              title: 'Peringatan',
+              text: res.kuis.message,
+              type: 'error',
+              allowOutsideClick: false,
+              showConfirmButton: true,
+            });
+          }
+        }
       });
     });
   });

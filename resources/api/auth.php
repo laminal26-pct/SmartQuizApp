@@ -82,7 +82,11 @@
               $exp = date('Y-m-d H:i:s',strtotime('+7 day'));
               $loginDate = date('Y-m-d H:i:s',strtotime('now'));
               $updateLogin = mysqli_query($link,"UPDATE tb_users SET first_login='$loginDate', ip_addr='$ipaddress' WHERE id_user='$id' LIMIT 1");
-              $updateToken = mysqli_query($link,"UPDATE tb_token SET firebase_token='$tokenFirebase', access_token='$token', forget_token=NULL, expried_in='$exp', updated_at='$loginDate' WHERE id_user='$id' LIMIT 1");
+              if ($tokenFirebase != NULL) {
+                $updateToken = mysqli_query($link,"UPDATE tb_token SET firebase_token='$tokenFirebase', access_token='$token', forget_token=NULL, expried_in='$exp', updated_at='$loginDate' WHERE id_user='$id' LIMIT 1");
+              } else {
+                $updateToken = mysqli_query($link,"UPDATE tb_token SET access_token='$token', forget_token=NULL, expried_in='$exp', updated_at='$loginDate' WHERE id_user='$id' LIMIT 1");
+              }
               $idUser = $r['id_user'];
               $lengkap = '1';
               $sqlUser = mysqli_fetch_assoc(mysqli_query($link,"SELECT * FROM tb_profile WHERE id_user='$idUser'"));

@@ -2,7 +2,7 @@
 // Configuration Apps
 define('APPDEBUG', 'DEVELOPMENT'); // DEVELOPMENT for Build Apps And PRODUCTION for Release Apps
 define('APPNAME', 'SMART QUIZ APP');
-define('BASE_URL', 'http://192.168.1.153/SmartQuizApp'); // URL Apps
+define('BASE_URL', 'http://192.168.43.190/SmartQuizApp'); // URL Apps
 define('TIMEZONE', 'Asia/Jakarta'); // Timezone Apps
 define('FIREBASE_API_KEY', 'AAAA63ihFkU:APA91bFSJyOzJkU2dHh78DzMOGJthyHcPP9p7v49LYEKaf6YHD4WkGp15ZELF9b8fupbYYbNxN51iYqUGi6GFvN5cBzP75eJz-0HmGamck0qauINkpRb6dt9yn_DN39RZxEcpbZ4eacO');
 
