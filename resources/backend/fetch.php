@@ -127,60 +127,99 @@ if (isset($_SESSION['is_logged'])) {
                          INNER JOIN tb_level ON tb_level.id_level = tb_users.id_level
                          WHERE tb_level.nama_level='user'";
             $exec = mysqli_query($link,$sqlToken);
-            while ($r = mysqli_fetch_assoc($exec)) {
-              if ($r['firebase_token'] != NULL) {
-                $message['data'] = array(
-                  'tipe' => 'kuisTerbaru',
-                  'subtitle' => 'Kuis Terbaru',
-                  'title' => 'Hi,' . $r['name'],
-                  'message' => 'Ada kuis baru nih ' . $k['judul'],
-                  'image' => $url . '/assets/img/kuis/' . $k['cover'],
-                  'namaKuis' => $k['judul'],
-                  'slug' => $k['slug']
+            $sqlProfileKuis = "SELECT tb_kuis.id_kuis, tb_kuis.id_user, tb_kuis.judul, tb_users.id_user,
+                               tb_users.name, tb_token.id_user, tb_token.firebase_token FROM tb_kuis
+                               INNER JOIN tb_users ON tb_users.id_user = tb_kuis.id_user
+                               LEFT JOIN tb_token ON tb_token.id_user = tb_users.id_user
+                               WHERE tb_kuis.id_kuis='$id'";
+            $execPK = mysqli_query($link,$sqlProfileKuis);
+            if ($execPK) {
+              $b = mysqli_fetch_assoc($execPK);
+              $message['data'] = array(
+                'tipe' => 'aktivasiKuisAuthor',
+                'subtitle' => 'Aktivasi Kuis',
+                'title' => 'Hi,' . $b['name'],
+                'message' => 'Kuis mu dengan judul ' . $b['judul'] . ' telah diaktifkan'
+              );
+              $devicetoken = $b['firebase_token'];
+              $fields = array(
+                'to' => $devicetoken,
+                'data' => $message
+              );
+              $headers = array(
+                'Authorization: key='.FIREBASE_API_KEY,
+                'Content-Type: application/json'
+              );
+              $urlFcm = 'https://fcm.googleapis.com/fcm/send';
+              $ch = curl_init();
+              curl_setopt( $ch,CURLOPT_URL,$urlFcm);
+              curl_setopt( $ch,CURLOPT_POST,true);
+              curl_setopt( $ch,CURLOPT_HTTPHEADER,$headers);
+              curl_setopt( $ch,CURLOPT_RETURNTRANSFER,true);
+              curl_setopt( $ch,CURLOPT_SSL_VERIFYPEER,false);
+              curl_setopt( $ch,CURLOPT_POSTFIELDS,json_encode($fields));
+              curl_exec($ch);
+              if (curl_error($ch)) {
+                $data['kuis'] = array(
+                  'kode' => '0',
+                  'message' => curl_error($ch)
                 );
-                $devicetoken = $r['firebase_token'];
-                $fields = array(
-                  'to' => $devicetoken,
-                  'data' => $message
-                );
-                $headers = array(
-                	'Authorization: key='.FIREBASE_API_KEY,
-                	'Content-Type: application/json'
-                );
-                $urlFcm = 'https://fcm.googleapis.com/fcm/send';
-                $ch = curl_init();
-                curl_setopt( $ch,CURLOPT_URL,$urlFcm);
-                curl_setopt( $ch,CURLOPT_POST,true);
-                curl_setopt( $ch,CURLOPT_HTTPHEADER,$headers);
-                curl_setopt( $ch,CURLOPT_RETURNTRANSFER,true);
-                curl_setopt( $ch,CURLOPT_SSL_VERIFYPEER,false);
-                curl_setopt( $ch,CURLOPT_POSTFIELDS,json_encode($fields));
-                curl_exec($ch);
-                if (curl_error($ch)) {
-                  $error_msg = curl_error($ch);
-                }
-                else {
-                  $data['kuis'] = array(
-                    'kode' => '1',
-                    'message' => 'Kuis telah diaktifkan'
-                  );
-                }
-                curl_close($ch);
-                if (isset($error_msg)) {
-                  $data['kuis'] = array(
-                    'kode' => '0',
-                    'message' => $error_msg
-                  );
-                }
               }
               else {
-                $data['kuis'] = array(
-                  'kode' => '1',
-                  'message' => 'Kuis telah diaktifkan tanpa notifikasi'
-                );
+                while ($r = mysqli_fetch_assoc($exec)) {
+                  if ($r['firebase_token'] != NULL) {
+                    $message['data'] = array(
+                      'tipe' => 'kuisTerbaru',
+                      'subtitle' => 'Kuis Terbaru',
+                      'title' => 'Hi,' . $r['name'],
+                      'message' => 'Ada kuis baru nih ' . $k['judul'],
+                      'image' => $url . '/assets/img/kuis/' . $k['cover'],
+                      'namaKuis' => $k['judul'],
+                      'slug' => $k['slug']
+                    );
+                    $devicetoken = $r['firebase_token'];
+                    $fields = array(
+                      'to' => $devicetoken,
+                      'data' => $message
+                    );
+                    $headers = array(
+                    	'Authorization: key='.FIREBASE_API_KEY,
+                    	'Content-Type: application/json'
+                    );
+                    $urlFcm = 'https://fcm.googleapis.com/fcm/send';
+                    $ch1 = curl_init();
+                    curl_setopt( $ch1,CURLOPT_URL,$urlFcm);
+                    curl_setopt( $ch1,CURLOPT_POST,true);
+                    curl_setopt( $ch1,CURLOPT_HTTPHEADER,$headers);
+                    curl_setopt( $ch1,CURLOPT_RETURNTRANSFER,true);
+                    curl_setopt( $ch1,CURLOPT_SSL_VERIFYPEER,false);
+                    curl_setopt( $ch1,CURLOPT_POSTFIELDS,json_encode($fields));
+                    curl_exec($ch1);
+                    if (curl_error($ch1)) {
+                      $data['kuis'] = array(
+                        'kode' => '0',
+                        'message' => curl_error($ch)
+                      );
+                    }
+                    else {
+                      $data['kuis'] = array(
+                        'kode' => '1',
+                        'message' => 'Kuis telah diaktifkan'
+                      );
+                    }
+                    curl_close($ch1);
+                  }
+                  else {
+                    $data['kuis'] = array(
+                      'kode' => '1',
+                      'message' => 'Kuis telah diaktifkan tanpa notifikasi'
+                    );
+                  }
+                }
+                mysqli_query($link,"UPDATE tb_kuis SET status='1' WHERE id_kuis='$id'");
               }
+              curl_close($ch);
             }
-            mysqli_query($link,"UPDATE tb_kuis SET status='1' WHERE id_kuis='$id'");
           }
           else {
             $data['kuis'] = array(

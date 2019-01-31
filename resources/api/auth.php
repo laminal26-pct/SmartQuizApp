@@ -88,51 +88,47 @@
                 $updateToken = mysqli_query($link,"UPDATE tb_token SET access_token='$token', forget_token=NULL, expried_in='$exp', updated_at='$loginDate' WHERE id_user='$id' LIMIT 1");
               }
               $idUser = $r['id_user'];
-              $lengkap = '1';
               $sqlUser = mysqli_fetch_assoc(mysqli_query($link,"SELECT * FROM tb_profile WHERE id_user='$idUser'"));
               if ($sqlUser['tgl_lahir'] == "" || $sqlUser['jk'] == "" || $sqlUser['no_hp'] == "" || $sqlUser['almt'] == "" ||
                   $sqlUser['nama_bank'] == "" || $sqlUser['no_rek'] == "" || $sqlUser['atas_nama'] == "") {
-                $lengkap = '0';
+                    $message['data'] = array(
+                      'tipe' => 'lengkapiProfile',
+                      'subtitle' => 'Lengkapi Profil Anda',
+                      'title' => 'Hi,' . $sqlUser['nama'],
+                      'message' => 'Yuk, lengkapi profil mu di menu profil aplikasi.'
+                    );
+                    $devicetoken = $tokenFirebase;
+                    $fields = array(
+                      'to' => $devicetoken,
+                      'data' => $message
+                    );
+                    $headers = array(
+                      'Authorization: key='.FIREBASE_API_KEY,
+                      'Content-Type: application/json'
+                    );
+                    $urlFcm = 'https://fcm.googleapis.com/fcm/send';
+                    $ch = curl_init();
+                    curl_setopt( $ch,CURLOPT_URL,$urlFcm);
+                    curl_setopt( $ch,CURLOPT_POST,true);
+                    curl_setopt( $ch,CURLOPT_HTTPHEADER,$headers);
+                    curl_setopt( $ch,CURLOPT_RETURNTRANSFER,true);
+                    curl_setopt( $ch,CURLOPT_SSL_VERIFYPEER,false);
+                    curl_setopt( $ch,CURLOPT_POSTFIELDS,json_encode($fields));
+                    curl_exec($ch);
+                    curl_close($ch);
               }
-              else {
-                $lengkap = '1';
-              }
-              $notifAkun = array();
-              if ($lengkap == 0) {
-                $notifAkun =
-                $data['auth'] = array(
-                  'kode' => '1',
-                  'message' => 'Login Sukses !',
-                  'user' => array(
-                    'nama' => $r['name'],
-                    'email' => $r['email'],
-                    'level' => $r['nama_level'],
-                    'saldo' => number_format($sqlUser['saldo']),
-                    'token' => $token,
-                  ),
-                  'exp' => $exp,
-                  'notif' => array(
-                                'title' => 'Pemberitahuan',
-                                'message' => 'Lengkapi Profil Anda !',
-                                'setNotif' => true
-                              ),
-                );
-              }
-              else {
-                $data['auth'] = array(
-                  'kode' => '1',
-                  'message' => 'Login Sukses !',
-                  'user' => array(
-                    'nama' => $r['name'],
-                    'email' => $r['email'],
-                    'level' => $r['nama_level'],
-                    'saldo' => number_format($sqlUser['saldo']),
-                    'token' => $token,
-                  ),
-                  'exp' => $exp,
-                  'notif' => array('setNotif' => false),
-                );
-              }
+              $data['auth'] = array(
+                'kode' => '1',
+                'message' => 'Login Sukses !',
+                'user' => array(
+                  'nama' => $r['name'],
+                  'email' => $r['email'],
+                  'level' => $r['nama_level'],
+                  'saldo' => number_format($sqlUser['saldo']),
+                  'token' => $token,
+                ),
+                'exp' => $exp,
+              );
               $_SESSION['is_logged'] = true;
               $_SESSION['username'] = $r['name'];
               $_SESSION['email'] = $r['email'];
