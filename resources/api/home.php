@@ -287,59 +287,69 @@
             $sqlKuis .= " AND tb_kuis.slug='$slug'";
             $execKuis = mysqli_query($link,$sqlKuis);
             $k = mysqli_fetch_assoc($execKuis);
-
-            if (mysqli_num_rows($execKuis) == 1) {
-              if ($k['harga'] <= $p['saldo']) {
-                $sqlProfile = "SELECT tb_users.id_user, tb_users.id_level, tb_profile.*, tb_level.* FROM tb_users
-                LEFT JOIN tb_profile ON tb_profile.id_user = tb_users.id_user
-                INNER JOIN tb_level ON tb_level.id_level = tb_users.id_level
-                WHERE tb_level.nama_level='admin'";
-                $execAdmin = mysqli_query($link,$sqlProfile);
-                while ($r = mysqli_fetch_assoc($execAdmin)) {
-                  $id = $r['id_user'];
-                  $price = ($k['harga'] * 0.8) / mysqli_num_rows($execAdmin);
-                  mysqli_query($link,"UPDATE tb_profile SET saldo=saldo+$price WHERE id_user='$id'");
-                }
-                $soal = array();
-                $idKuis = $k['idKuis'];
-                $idAuthor = $k['id_user'];
-                $acak = $k['soal_acak'];
-                $jmlh = $k['jumlah_soal'];
-                $sqlSoal = "";
-                if ($acak == 1) {
-                  $sqlSoal .= "SELECT * FROM tb_soal WHERE id_kuis='$idKuis' ORDER BY RAND() LIMIT 0,$jmlh";
+            $idUserNilai = $p['id_user'];
+            $idKuisNilai = $k['id_kuis'];
+            $checkSdhMain = mysqli_query($link,"SELECT id_user, id_kuis FROM tb_nilai WHERE id_user='$idUserNilai' AND id_kuis='$idKuisNilai'");
+            if (mysqli_num_rows($checkSdhMain) > 0) {
+              $data['home'] = array(
+                'kode' => '0',
+                'message' => 'Maaf, Anda sudah ikut kuis ini !'
+              );
+            }
+            else {
+              if (mysqli_num_rows($execKuis) == 1) {
+                if ($k['harga'] <= $p['saldo']) {
+                  $sqlProfile = "SELECT tb_users.id_user, tb_users.id_level, tb_profile.*, tb_level.* FROM tb_users
+                  LEFT JOIN tb_profile ON tb_profile.id_user = tb_users.id_user
+                  INNER JOIN tb_level ON tb_level.id_level = tb_users.id_level
+                  WHERE tb_level.nama_level='admin'";
+                  $execAdmin = mysqli_query($link,$sqlProfile);
+                  while ($r = mysqli_fetch_assoc($execAdmin)) {
+                    $id = $r['id_user'];
+                    $price = ($k['harga'] * 0.8) / mysqli_num_rows($execAdmin);
+                    mysqli_query($link,"UPDATE tb_profile SET saldo=saldo+$price WHERE id_user='$id'");
+                  }
+                  $soal = array();
+                  $idKuis = $k['idKuis'];
+                  $idAuthor = $k['id_user'];
+                  $acak = $k['soal_acak'];
+                  $jmlh = $k['jumlah_soal'];
+                  $sqlSoal = "";
+                  if ($acak == 1) {
+                    $sqlSoal .= "SELECT * FROM tb_soal WHERE id_kuis='$idKuis' ORDER BY RAND() LIMIT 0,$jmlh";
+                  }
+                  else {
+                    $sqlSoal .= "SELECT * FROM tb_soal WHERE id_kuis='$idKuis' LIMIT 0,$jmlh";
+                  }
+                  $execSoal = mysqli_query($link,$sqlSoal);
+                  $price = $k['harga'] * 0.2;
+                  mysqli_query($link,"UPDATE tb_profile SET saldo=saldo+$price WHERE id_user='$idAuthor'");
+                  $idUser = $p['id_user'];
+                  $price = $k['harga'];
+                  mysqli_query($link,"UPDATE tb_profile SET saldo=saldo-$price WHERE id_user='$idUser'");
+                  $data['home'] = array(
+                    'kode' => '1',
+                    'title' => $k['judul'],
+                    'message' => 'Saldo Cukup',
+                    'saldo' => $p['saldo'] - $k['harga'],
+                    'kuis' => array('id_kuis' => $k['idKuis']),
+                  );
                 }
                 else {
-                  $sqlSoal .= "SELECT * FROM tb_soal WHERE id_kuis='$idKuis' LIMIT 0,$jmlh";
+                  $data['home'] = array(
+                    'kode' => '0',
+                    'message' => 'Saldo anda tidak cukup !',
+                    'saldo anda' => $p['saldo'],
+                    'harga kuis' => $k['harga']
+                  );
                 }
-                $execSoal = mysqli_query($link,$sqlSoal);
-                $price = $k['harga'] * 0.2;
-                mysqli_query($link,"UPDATE tb_profile SET saldo=saldo+$price WHERE id_user='$idAuthor'");
-                $idUser = $p['id_user'];
-                $price = $k['harga'];
-                mysqli_query($link,"UPDATE tb_profile SET saldo=saldo-$price WHERE id_user='$idUser'");
-                $data['home'] = array(
-                  'kode' => '1',
-                  'title' => $k['judul'],
-                  'message' => 'Saldo Cukup',
-                  'saldo' => $p['saldo'] - $k['harga'],
-                  'kuis' => array('id_kuis' => $k['idKuis']),
-                );
               }
               else {
                 $data['home'] = array(
                   'kode' => '0',
-                  'message' => 'Saldo anda tidak cukup !',
-                  'saldo anda' => $p['saldo'],
-                  'harga kuis' => $k['harga']
+                  'message' => 'Kuis tidak ditemukan !'
                 );
               }
-            }
-            else {
-              $data['home'] = array(
-                'kode' => '0',
-                'message' => 'Kuis tidak ditemukan !'
-              );
             }
           }
           // tampil soal
