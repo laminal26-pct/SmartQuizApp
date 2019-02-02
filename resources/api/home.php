@@ -502,7 +502,7 @@
               );
             }
           }
-          // Top Up Saldo
+          // Top Up Saldo Voucher
           elseif ($route == "home" && $uuid == "topUp" && isset($_GET['email'])) {
             $email = strip_tags($_GET['email']);
             $kode = strip_tags($_POST['kode']);
@@ -521,13 +521,15 @@
                   $jmlh = $checkKode['jumlah'];
                   $idKode = $checkKode['id_voucher'];
                   $date = date('Y-m-d H:i:s',strtotime('now'));
-                  $user = mysqli_fetch_assoc(mysqli_query($link,"SELECT id_user,email FROM tb_users WHERE email='$email'"));
+                  $user = mysqli_fetch_assoc(mysqli_query($link,"SELECT tb_users.id_user,tb_users.email,tb_users.name, tb_token.id_user, tb_token.firebase_token FROM tb_users
+                    INNER JOIN tb_token ON tb_token.id_user = tb_users.id_user
+                    WHERE tb_users.email='$email'"));
                   $id = $user['id_user'];
 
                   if ($app == "DEVELOPMENT") {
                     mysqli_query($link,"UPDATE tb_profile SET saldo=saldo+'$jmlh' WHERE id_user='$id'");
                     mysqli_query($link,"UPDATE tb_voucher SET status='1' WHERE id_voucher='$idKode'");
-                    mysqli_query($link,"INSERT INTO tb_voucher_user VALUES(NULL,'$idKode','$id','$date')");
+                    mysqli_query($link,"INSERT INTO tb_voucher_user VALUES(NULL,'$idKode',NULL,'$id','voucher','$date')");
                     $data['home'] = array(
                       'kode' => '1',
                       'title' => 'Top Up Saldo',
@@ -544,7 +546,32 @@
                     else {
                       mysqli_query($link,"UPDATE tb_profile SET saldo=saldo+'$jmlh' WHERE id_user='$id'");
                       mysqli_query($link,"UPDATE tb_voucher SET status='1' WHERE id_voucher='$idKode'");
-                      mysqli_query($link,"INSERT INTO tb_voucher_user VALUES(NULL,'$idKode','$id','$date')");
+                      mysqli_query($link,"INSERT INTO tb_voucher_user VALUES(NULL,'$idKode',NULL,'$id','voucher','$date')");
+                      $message['data'] = array(
+                        'tipe' => 'topUpSaldo',
+                        'subtitle' => 'Top up saldo',
+                        'title' => 'Hi, ' . $user['name'],
+                        'message' => 'Terima kasih telah melakukan top up saldo voucher sebesar Rp ' . number_format($jmlh)
+                      );
+                      $devicetoken = $user['firebase_token'];
+                      $fields = array(
+                        'to' => $devicetoken,
+                        'data' => $message
+                      );
+                      $headers = array(
+                        'Authorization: key='.FIREBASE_API_KEY,
+                        'Content-Type: application/json'
+                      );
+                      $urlFcm = 'https://fcm.googleapis.com/fcm/send';
+                      $ch = curl_init();
+                      curl_setopt( $ch,CURLOPT_URL,$urlFcm);
+                      curl_setopt( $ch,CURLOPT_POST,true);
+                      curl_setopt( $ch,CURLOPT_HTTPHEADER,$headers);
+                      curl_setopt( $ch,CURLOPT_RETURNTRANSFER,true);
+                      curl_setopt( $ch,CURLOPT_SSL_VERIFYPEER,false);
+                      curl_setopt( $ch,CURLOPT_POSTFIELDS,json_encode($fields));
+                      curl_exec($ch);
+                      curl_close($ch);
                       $data['home'] = array(
                         'kode' => '1',
                         'title' => 'Top Up Saldo',
@@ -574,14 +601,76 @@
               );
             }
           }
+          // Top Up Saldo INAPP
+          elseif ($route == "home" && $uuid == "inapp" && isset($_GET['email'])) {
+            $email = $_GET['email'];
+            $sqlProfile .= " WHERE tb_users.email='$email'";
+            $exc = mysqli_fetch_assoc(mysqli_query($link,$sqlProfile));
+            $id = $exc['id_user'];
+
+            $orderId = $_POST['orderId'];
+            $package = $_POST['packageName'];
+            $purchaseTime = $_POST['purchaseTime'];
+            $purchaseToken = $_POST['purchaseToken'];
+            $productId = $_POST['productId'];
+            $date = date('Y-m-d H:i:s',strtotime('now'));
+            $sqlBiling = mysqli_query($link,"INSERT INTO tb_billing VALUES(NULL,'$orderId','$package','$purchaseTime','$purchaseToken','$productId')");
+            if ($sqlBiling) {
+              $idOrder = mysqli_fetch_assoc(mysqli_query($link,"SELECT id_billing, orderId FROM tb_billing WHERE orderId='$orderId'"));
+              $idKode = $idOrder['id_billing'];
+              mysqli_query($link,"UPDATE tb_profile SET saldo=saldo+'$productId' WHERE id_user='$id'");
+              mysqli_query($link,"INSERT INTO tb_voucher_user VALUES(NULL,NULL,'$idKode','$id','inapp','$date')");
+              $c = mysqli_fetch_assoc(mysqli_query($link,"SELECT saldo FROM tb_profile WHERE id_user='$id'"));
+              $t = mysqli_fetch_assoc(mysqli_query($link,"SELECT firebase_token FROM tb_token WHERE id_user='$id'"));
+              $message['data'] = array(
+                'tipe' => 'topUpSaldo',
+                'subtitle' => 'Top up saldo',
+                'title' => 'Hi, ' . $exc['nama'],
+                'message' => 'Terima kasih telah melakukan top up saldo via G-pay sebesar Rp ' . number_format($productId)
+              );
+              $devicetoken = $t['firebase_token'];
+              $fields = array(
+                'to' => $devicetoken,
+                'data' => $message
+              );
+              $headers = array(
+                'Authorization: key='.FIREBASE_API_KEY,
+                'Content-Type: application/json'
+              );
+              $urlFcm = 'https://fcm.googleapis.com/fcm/send';
+              $ch = curl_init();
+              curl_setopt( $ch,CURLOPT_URL,$urlFcm);
+              curl_setopt( $ch,CURLOPT_POST,true);
+              curl_setopt( $ch,CURLOPT_HTTPHEADER,$headers);
+              curl_setopt( $ch,CURLOPT_RETURNTRANSFER,true);
+              curl_setopt( $ch,CURLOPT_SSL_VERIFYPEER,false);
+              curl_setopt( $ch,CURLOPT_POSTFIELDS,json_encode($fields));
+              curl_exec($ch);
+              curl_close($ch);
+              $data['home'] = array(
+                'kode' => '1',
+                'message' => 'Berhasil melakukan top up saldo inapp',
+                'saldo' => number_format($c['saldo'])
+              );
+            }
+            else {
+              $data['home'] = array(
+                'kode' => '0',
+                'message' => mysqli_query($link)
+              );
+            }
+          }
           // History Top Up
           elseif ($route == "home" && $uuid == "historyTopUp" && isset($_GET['email'])) {
             $email = $_GET['email'];
             $sqlProfile .= " WHERE tb_users.email='$email'";
             $exc = mysqli_fetch_assoc(mysqli_query($link,$sqlProfile));
             $id = $exc['id_user'];
-            $sqlHistory = mysqli_query($link, "SELECT tb_voucher_user.*, tb_voucher.* FROM tb_voucher_user INNER JOIN tb_voucher ON tb_voucher.id_voucher = tb_voucher_user.id_voucher
-                WHERE tb_voucher_user.id_user='$id'");
+            $query = "SELECT tb_voucher_user.*, tb_voucher.*, tb_billing.* FROM tb_voucher_user
+                      LEFT JOIN tb_voucher ON tb_voucher.id_voucher = tb_voucher_user.id_voucher
+                      LEFT JOIN tb_billing ON tb_billing.id_biling = tb_voucher_user.id_billing
+                      WHERE tb_voucher_user.id_user='$id' ORDER BY tb_voucher_user.created_at DESC";
+            $sqlHistory = mysqli_query($link,$query);
             if (mysqli_num_rows($sqlHistory) > 0) {
               $i = 1;
               while ($r = mysqli_fetch_assoc($sqlHistory)) {
@@ -589,7 +678,7 @@
                 $data['home']['saldo'] = number_format($exc['saldo']);
                 $data['home']['historyTopUp'][] = array(
                   'nomor' => $i++.".",
-                  'jumlah' => "Top Up Saldo sebesar " . number_format($r['jumlah']),
+                  'jumlah' => $r['tipe'] == "voucher" ? "Top Up Saldo voucher sebesar Rp. " . number_format($r['jumlah']) : "Top Up Saldo via G-pay sebesar Rp. " .number_format($r['productId']),
                   'tanggal' => date('d-m-Y', strtotime($r['created_at']))
                 );
               }
