@@ -437,32 +437,35 @@
             $p = mysqli_fetch_assoc($execProfile);
             $idUser = $p['id_user'];
             $idKuis = $_GET['idKuis'];
-            $sqlResultBenar = "SELECT COUNT(ket) as BENAR FROM tb_result WHERE id_user='$idUser' AND id_kuis='$idKuis' AND ket='1'";
-            $benar = mysqli_query($link,$sqlResultBenar);
-            $resultB = mysqli_fetch_assoc($benar);
-            $b = $resultB['BENAR'];
-            $sqlResultSalah = "SELECT COUNT(ket) as SALAH FROM tb_result WHERE id_user='$idUser' AND id_kuis='$idKuis' AND ket='0'";
-            $salah = mysqli_query($link,$sqlResultSalah);
-            $resultS = mysqli_fetch_assoc($salah);
-            $s = $resultS['SALAH'];
-            if ($benar && $salah) {
-              $nilai = ($b * 100) / ($b + $s);
-              $n = doubleval($nilai);
-              $date = date('Y-m-d H:i:s', strtotime('now'));
-              $sqlNilai = mysqli_query($link,"INSERT INTO tb_nilai VALUES(NULL,'$idUser','$idKuis','$b','$s','$n','$date')");
-              if ($sqlNilai) {
-                mysqli_query($link,"DELETE FROM tb_result WHERE id_user='$idUser' AND id_kuis='$idKuis'");
-                $data['home'] = array(
-                  'kode' => '1',
-                  'kuis' => array('id_kuis' => $idKuis),
-                  'nilai' => doubleval($nilai)
-                );
-              }
-              else {
-                $data['home'] = array(
-                  'kode' => '0',
-                  'message' => mysqli_error($link)
-                );
+            $checkResultNotNull = mysqli_query($link,"SELECT * FROM tb_result WHERE id_user='$idUser' AND id_kuis='$idKuis'");
+            if (mysqli_num_rows($checkResultNotNull) > 0) {
+              $sqlResultBenar = "SELECT COUNT(ket) as BENAR FROM tb_result WHERE id_user='$idUser' AND id_kuis='$idKuis' AND ket='1'";
+              $benar = mysqli_query($link,$sqlResultBenar);
+              $resultB = mysqli_fetch_assoc($benar);
+              $b = $resultB['BENAR'];
+              $sqlResultSalah = "SELECT COUNT(ket) as SALAH FROM tb_result WHERE id_user='$idUser' AND id_kuis='$idKuis' AND ket='0'";
+              $salah = mysqli_query($link,$sqlResultSalah);
+              $resultS = mysqli_fetch_assoc($salah);
+              $s = $resultS['SALAH'];
+              if ($benar && $salah) {
+                $nilai = @($b * 100) / ($b + $s);
+                $n = doubleval($nilai);
+                $date = date('Y-m-d H:i:s', strtotime('now'));
+                $sqlNilai = mysqli_query($link,"INSERT INTO tb_nilai VALUES(NULL,'$idUser','$idKuis','$b','$s','$n','$date')");
+                if ($sqlNilai) {
+                  mysqli_query($link,"DELETE FROM tb_result WHERE id_user='$idUser' AND id_kuis='$idKuis'");
+                  $data['home'] = array(
+                    'kode' => '1',
+                    'kuis' => array('id_kuis' => $idKuis),
+                    'nilai' => doubleval($nilai)
+                  );
+                }
+                else {
+                  $data['home'] = array(
+                    'kode' => '0',
+                    'message' => mysqli_error($link)
+                  );
+                }
               }
             }
           }

@@ -513,7 +513,7 @@
                                LEFT JOIN tb_kuis ON tb_kuis.id_kuis = tb_nilai.id_kuis
                                LEFT JOIN tb_users ON tb_users.id_user = tb_kuis.id_user
                                LEFT JOIN (SELECT * FROM tb_profile GROUP BY id_user) tb_profile ON tb_nilai.id_user = tb_profile.id_user
-                               WHERE tb_users.email='$email'";
+                               WHERE tb_users.email='$email' AND tb_users.id_user != tb_nilai.id_user";
             $exec = mysqli_query($link, $sqlHistoryIkut);
             if (mysqli_num_rows($exec) > 0) {
               $h = array();
