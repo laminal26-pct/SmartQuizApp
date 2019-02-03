@@ -79,7 +79,7 @@
                                 INNER JOIN tb_users ON tb_users.id_user = tb_kuis.id_user
                                 INNER JOIN tb_kategori ON tb_kategori.id_kategori = tb_kuis.id_kategori
                                 INNER JOIN tb_mapel ON tb_mapel.id_mapel = tb_kuis.id_mapel
-                                WHERE tb_kuis.status='1' AND rate > 3 OR tb_kuis.judul LIKE '%$acakKuis%' ORDER BY RAND() limit 1,$tampilKuis";
+                                WHERE tb_kuis.status='1' OR tb_kuis.judul LIKE '%$acakKuis%' ORDER BY RAND() limit 1,$tampilKuis";
                   }
                   elseif ($key == 1) {
                     $acakKuis = $jmlh > 400 && $jmlh < 800 ? rand(401,800) : rand(1,$jmlh);
@@ -97,7 +97,7 @@
                                 INNER JOIN tb_users ON tb_users.id_user = tb_kuis.id_user
                                 INNER JOIN tb_kategori ON tb_kategori.id_kategori = tb_kuis.id_kategori
                                 INNER JOIN tb_mapel ON tb_mapel.id_mapel = tb_kuis.id_mapel
-                                WHERE tb_kuis.status='1' AND rate > 3 OR tb_kuis.judul LIKE '%$acakKuis%' ORDER BY RAND() limit 1,$tampilKuis";
+                                WHERE tb_kuis.status='1' OR tb_kuis.judul LIKE '%$acakKuis%' ORDER BY RAND() limit 1,$tampilKuis";
                   }
                   elseif ($key == 3) {
                     $acakKuis = $jmlh > 1201 && $jmlh < 1600 ? rand(1201,1600) : rand(1,$jmlh);
@@ -106,7 +106,7 @@
                                 INNER JOIN tb_users ON tb_users.id_user = tb_kuis.id_user
                                 INNER JOIN tb_kategori ON tb_kategori.id_kategori = tb_kuis.id_kategori
                                 INNER JOIN tb_mapel ON tb_mapel.id_mapel = tb_kuis.id_mapel
-                                WHERE tb_kuis.status='1' AND rate > 3 OR tb_kuis.judul LIKE '%$acakKuis%' ORDER BY RAND() limit 1,$tampilKuis";
+                                WHERE tb_kuis.status='1' OR tb_kuis.judul LIKE '%$acakKuis%' ORDER BY RAND() limit 1,$tampilKuis";
                   }
                   elseif ($key == 4) {
                     $acakKuis = $jmlh > 1600 ? rand(1601,$jmlh) : rand(1,$jmlh);
